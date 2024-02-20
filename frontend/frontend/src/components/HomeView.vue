@@ -1,0 +1,108 @@
+<template>
+  <nav class="navbar">
+    <span class="brand">Music Stream</span>
+
+    <router-link to="/home" class="btn btn-primary"
+      ><span class="text">Home</span></router-link
+    >
+    <router-link to="/creator" class="btn btn-primary"
+      ><span class="text">Creators Account</span></router-link
+    >
+    <router-link to="/home" class="btn btn-primary"
+      ><span class="text">Profile</span></router-link
+    >
+    <router-link to="/home" class="btn btn-primary"
+      ><span class="text">Log out</span></router-link
+    >
+
+    <!-- Add the search bar here -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search" v-model="searchQuery" />
+      <button @click="search">Search</button>
+    </div>
+  </nav>
+  <div
+    :class="{
+      'card-container': cardData.length <= 5,
+      'card-container-multiline': cardData.length > 5,
+    }"
+  >
+    <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
+  </div>
+</template>
+
+<script>
+import CardView from "./CardView.vue";
+export default {
+  name: "HomeView",
+  components: {
+    CardView,
+  },
+  data() {
+    return {
+      cardData: [
+        { songName: "Song 1", artistName: "Artist 1", rating: "5" },
+        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
+        { songName: "Song 3", artistName: "Artist 3", rating: "3" },
+        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+
+        // Add more card data as needed
+      ],
+    };
+  },
+};
+</script>
+
+<style scoped>
+.card-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.card-container-multiline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #111111;
+  color: white;
+}
+
+.text {
+  color: white;
+}
+
+.brand {
+  font-size: 1.5em;
+}
+
+.btn {
+  margin-left: 10px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+input {
+  padding: 5px;
+  margin-right: 5px;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
