@@ -28,12 +28,8 @@ export default {
   },
   methods: {
     submitLogin() {
-      // Replace this with your actual login logic (e.g., API call)
       console.log("Username:", this.username);
       console.log("Password:", this.password);
-
-      // Handle potential errors here
-      // this.error = "Invalid username or password";
     },
   },
 };
