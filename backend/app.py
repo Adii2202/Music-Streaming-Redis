@@ -76,7 +76,7 @@ def login_user():
 
             # Retrieve email and store in session if not already present
             if "email" not in session:
-                conn = sqlite3.connect('your_database_name.db')
+                conn = sqlite3.connect('user_data.db')
                 cursor = conn.cursor()
                 cursor.execute(f"SELECT email FROM user WHERE username = '{username}'")
                 email = cursor.fetchone()
