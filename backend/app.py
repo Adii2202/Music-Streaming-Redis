@@ -20,37 +20,22 @@ from flask_session import Session
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*":{'origins':"http://localhost:8080", "allow_headers":"Access-Control-Allow-Origin"}})
+CORS(app, origins=["http://localhost:8080"])
 app.secret_key = "__privatekey__"
 app.static_folder = "static"
-# app.config['SESSION_TYPE'] = 'redis'
-# app.config['SESSION_PERMANENT'] = False
-# app.config['SESSION_USE_SIGNER'] = True
-# app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
 
 redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
-
-# m
-
-# Route for displaying the user login page
-# @app.route("/loginuser")
-# def userlogin():
-#     return render_template("loginUser.html")
 
 conn = sqlite3.connect("user_data.db", check_same_thread=False)
 cursor = conn.cursor()
 
-# Route for handling user registration
-# app = Flask(__name__)
-
 app.config["UPLOAD_FOLDER"] = "uploads"
 
-# server_session = Session(app)
-
-# @app.route("/", methods=["GET"])
-# def index():
-#     return render_template("home.html")
-
+server_session = Session(app)
 
 @app.route("/loginuser", methods=["POST"])
 def login_user():
@@ -89,44 +74,37 @@ def login_user():
 
     return jsonify({"error": "Method not allowed"}), 405
 
-@app.route("/registeruser", methods=["GET", "POST"])
+@app.route("/registeruser", methods=["POST"])
 def register_user():
     if request.method == "POST":
-        # name = request.form["name"]
-        name = request.form["name"]
-        email = request.form["email"]
-        password = request.form["password"]
-        # print(name, username, email, password)
+        data = request.json
+        name = data.get("name")
+        email = data.get("email")
+        username = data.get("username")
+        password = data.get("password")
+        print(name)
+        # Connect to the database
+        conn = sqlite3.connect('user_data.db')
+        cursor = conn.cursor()
 
-        if request.form["username"] != "":
-            username = request.form["username"]
-            statement = f"SELECT * from user where username='{username}';"
-            cursor.execute(statement)
-            data = cursor.fetchone()
+        # Check if username already exists
+        cursor.execute(f"SELECT * FROM user WHERE username = '{username}'")
+        existing_user = cursor.fetchone()
 
-            if data:
-                return render_template(
-                    "loginUser.html", error="Username already exists, login instead"
-                )
-            else:
-                if not data:
-                    cursor.execute(
-                        "INSERT INTO user (name, username, email, password, isAdmin) VALUES (?,?,?,?,0)",
-                        (name, username, email, password),
-                    )
-                    conn.commit()
-                    session["username"] = username
-                    session["email"] = email
-                    # conn.close()
-                    return render_template(
-                        "loginUser.html",
-                        message="Registration successful, please login",
-                    )
-    elif request.method == "GET":
-        return render_template("loginUser.html")
+        if existing_user:
+            conn.close()
+            return jsonify({"error": "Username already exists, login instead"}), 400
+        else:
+            # Insert new user into the database
+            cursor.execute(f"INSERT INTO user (name, username, email, password, isAdmin) VALUES ('{name}', '{username}', '{email}', '{password}', '{0}')",
+                           )
+            conn.commit()
+            session["username"] = username
+            session["email"] = email
+            conn.close()
+            return jsonify({"message": "Registration successful, please login"}), 200
 
-    # Redirect to login page after successful registration
-    return redirect("/loginuser")
+    return jsonify({"error": "Method not allowed"}), 405
 
 
 @app.route("/logout", methods=["GET", "POST"])
