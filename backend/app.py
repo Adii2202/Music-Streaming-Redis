@@ -9,6 +9,7 @@ from flask import (
     flash,
     session,
 )
+from flask_cors import CORS
 from collections import defaultdict
 from datetime import datetime
 import sys
@@ -19,12 +20,13 @@ from flask_session import Session
 
 
 app = Flask(__name__)
-app.static_folder = "static"
+CORS(app, resources={r"/*":{'origins':"http://localhost:8080", "allow_headers":"Access-Control-Allow-Origin"}})
 app.secret_key = "__privatekey__"
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+app.static_folder = "static"
+# app.config['SESSION_TYPE'] = 'redis'
+# app.config['SESSION_PERMANENT'] = False
+# app.config['SESSION_USE_SIGNER'] = True
+# app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
 
 redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
@@ -43,43 +45,49 @@ cursor = conn.cursor()
 
 app.config["UPLOAD_FOLDER"] = "uploads"
 
-server_session = Session(app)
+# server_session = Session(app)
 
 # @app.route("/", methods=["GET"])
 # def index():
 #     return render_template("home.html")
 
 
-@app.route("/loginuser", methods=["GET", "POST"])
+@app.route("/loginuser", methods=["POST"])
 def login_user():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        print(username, password)
-
-        # Check credentials against database
-        query = f"SELECT username, password from user WHERE username = '{username}' AND password = '{password}'"
+        data = request.json
+        username = data.get("username")
+        password = data.get("password")
+    
+        # Check credentials against database (use parameterized queries to prevent SQL injection)
+        query = f"SELECT username, password FROM user WHERE username = '{username}' AND password = '{password}'"
+        conn = sqlite3.connect("user_data.db", check_same_thread=False)
+        cursor = conn.cursor()
         cursor.execute(query)
 
         results = cursor.fetchall()
-        print(results)
+        conn.close()
+
         if len(results) == 0:
-            return render_template("loginUser.html", error="Wrong credentials provided")
+            return jsonify({"error": "Wrong credentials provided"}), 401
         else:
-            if "username" not in session:
-                session["username"] = username
+            # Store username in session
+            session["username"] = username
+
+            # Retrieve email and store in session if not already present
             if "email" not in session:
-                cursor.execute(f"SELECT email from user WHERE username = '{username}'")
+                conn = sqlite3.connect('your_database_name.db')
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT email FROM user WHERE username = '{username}'")
                 email = cursor.fetchone()
-                if email is not None:
-                    email = email[0]
-                    session["email"] = email
-            print("Login successful!")
-            return redirect("/")
+                conn.close()
 
-    return render_template("loginUser.html")
+                if email:
+                    session["email"] = email[0]
 
+            return jsonify({"message": "Login successful"}), 200
+
+    return jsonify({"error": "Method not allowed"}), 405
 
 @app.route("/registeruser", methods=["GET", "POST"])
 def register_user():
@@ -1020,4 +1028,4 @@ def register_admin():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5001)
+    app.run(debug=True)

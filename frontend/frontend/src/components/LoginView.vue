@@ -1,14 +1,26 @@
 <template>
   <div class="login-form">
     <h1>User Login</h1>
-    <form @submit.prevent="submitLogin">
+    <form @submit.prevent="submitLogin" method="post">
       <div class="form-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required />
+        <input
+          name="username"
+          type="text"
+          id="username"
+          v-model="username"
+          required
+        />
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
+        <input
+          name="password"
+          type="password"
+          id="password"
+          v-model="password"
+          required
+        />
       </div>
       <button type="submit">Login</button>
     </form>
@@ -20,6 +32,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "LoginView",
   data() {
@@ -30,13 +44,22 @@ export default {
     };
   },
   methods: {
-    submitLogin() {
-      // Replace this with your actual login logic (e.g., API call)
-      console.log("Username:", this.username);
-      console.log("Password:", this.password);
+    async submitLogin() {
+      try {
+        const response = await axios.post("http://127.0.0.1:5000/loginuser", {
+          username: this.username,
+          password: this.password,
+        });
 
-      // Handle potential errors here
-      // this.error = "Invalid username or password";
+        if (response.status === 200) {
+          this.$router.push("/home");
+        } else {
+          this.error = response.data.error;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        this.error = "An error occurred while logging in.";
+      }
     },
   },
 };
