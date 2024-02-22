@@ -1,20 +1,25 @@
 <template>
+  <AdminnavbarView />
   <div class="vercel-background d-flex flex-row justify-space-evenly">
     <div class="vercel-section vercel-section-1">
       <div class="d-flex flex-row justify-space-around">
-        <div class="w-auto h-auto vercel-square vercel-large-square">
-          <div>Genre</div>
-          <div>3</div>
+        <div
+          class="pt-4 pb-4 mb-4 w-auto h-auto d-flex flex-column vercel-square vercel-large-square"
+        >
+          <span class="text-h5 pd-4">Genre</span>
+          <span class="text-h5">3</span>
         </div>
-        <div class="w-auto p-10 vercel-square vercel-large-square">
-          <span>Genre</span>
-          <br />
-          <span>3</span>
+        <div
+          class="pt-4 pb-4 mb-4 w-auto d-flex flex-column p-10 vercel-square vercel-large-square"
+        >
+          <span class="text-h5">Total Tracks</span>
+          <span class="text-h5">3</span>
         </div>
-        <div class="w-auto vercel-square vercel-large-square">
-          <span>Genre</span>
-          <br />
-          <span>3</span>
+        <div
+          class="pt-4 pb-4 mb-4 w-auto d-flex flex-column vercel-square vercel-large-square"
+        >
+          <span class="text-h5">Total albums</span>
+          <span class="text-h5">3</span>
         </div>
       </div>
       <div
@@ -25,8 +30,12 @@
     </div>
     <div class="vercel-section vercel-section-2">
       <div class="d-flex flex-column justify-space-around">
-        <div class="vercel-square">square</div>
-        <div class="vercel-square">square</div>
+        <div class="pl-8 pt-8 pb-8 mb-4 d-flex flex-column vercel-square-1">
+          <div class="mb-4 text-h5 align-start">Recent Activity</div>
+          <div class="mb-2 pl-4 text-h4">Normal Users: 5</div>
+          <div class="pl-4 text-h4">Creators: 2</div>
+        </div>
+        <div class="pt-8 pb-8 vercel-square"><CirculargraphView /></div>
       </div>
     </div>
   </div>
@@ -34,23 +43,19 @@
 
 <script>
 import BarView from "../components/BarView.vue";
+import CirculargraphView from "../components/CirculargraphView.vue";
+import AdminnavbarView from "./AdminnavbarView.vue";
 export default {
   name: "AdmindashboardView",
   components: {
     BarView,
+    CirculargraphView,
+    AdminnavbarView,
   },
 };
 </script>
 
 <style scoped>
-.d-flex {
-  display: flex;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
 .justify-space-evenly {
   justify-content: space-evenly;
 }
@@ -88,6 +93,19 @@ export default {
   align-items: center;
   justify-content: center;
   margin: 5px;
+  border: 0.75px solid #fff; /* White border */
+  border-radius: 10px;
+}
+
+.vercel-square-1 {
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  margin: 5px;
+  border: 0.75px solid #fff; /* White border */
+  border-radius: 10px;
 }
 
 .vercel-large-square {
@@ -103,7 +121,7 @@ export default {
   align-items: center;
   justify-content: center;
   margin: 5px;
-  border: 2px solid #fff; /* White border */
+  border: 0.75px solid #fff; /* White border */
   border-radius: 10px; /* Rounded corners */
 }
 
