@@ -21,12 +21,7 @@
       <button @click="search">Search</button>
     </div>
   </nav>
-  <div
-    :class="{
-      'card-container': cardData.length <= 5,
-      'card-container-multiline': cardData.length > 5,
-    }"
-  >
+  <div class="card-container">
     <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
   </div>
 </template>
@@ -46,7 +41,9 @@ export default {
         { songName: "Song 3", artistName: "Artist 3", rating: "3" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-
+        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
         // Add more card data as needed
       ],
     };
@@ -56,17 +53,18 @@ export default {
 
 <style scoped>
 .card-container {
-  display: flex;
-  justify-content: space-around;
+  overflow-x: auto;
+  white-space: nowrap;
   margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
 }
 
-.card-container-multiline {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  margin-top: 20px;
+.card-container .card-view {
+  flex: 0 0 auto; /* Ensure the cards don't grow and shrink */
+  margin-right: 10px; /* Add some margin between cards */
 }
+
 .navbar {
   display: flex;
   justify-content: space-between;
