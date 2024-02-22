@@ -8,6 +8,7 @@ import HomeView from "../components/HomeView.vue";
 import CardView from "../components/CardView.vue";
 import CreatorsView from "../components/CreatorsView.vue";
 import UploadsongView from "../components/UploadsongView.vue";
+import AdmindashboardView from "../components/AdmindashboardView.vue";
 
 const routes = [
   {
@@ -49,6 +50,11 @@ const routes = [
     path: "/upload",
     name: "UploadsongView",
     component: UploadsongView,
+  },
+  {
+    path: "/dashboard",
+    name: "AdmindashboardView",
+    component: AdmindashboardView,
   },
 ];
 
