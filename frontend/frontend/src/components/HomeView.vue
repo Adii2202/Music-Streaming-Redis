@@ -11,8 +11,8 @@
     <router-link to="/home" class="btn btn-primary"
       ><span class="text">Profile</span></router-link
     >
-    <router-link to="/home" class="btn btn-primary"
-      ><span class="text">Log out</span></router-link
+    <router-link to="/home" class="btn btn-primary">
+      <span class="text">Log out </span></router-link
     >
 
     <!-- Add the search bar here -->
@@ -41,9 +41,10 @@ export default {
         { songName: "Song 3", artistName: "Artist 3", rating: "3" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        
+        
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        
         // Add more card data as needed
       ],
     };
