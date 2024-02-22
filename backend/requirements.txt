@@ -1,2 +1,4 @@
 flask
 sqlite3
+flask_cors
+flask_session
