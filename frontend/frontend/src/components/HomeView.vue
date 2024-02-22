@@ -11,15 +11,9 @@
     <router-link to="/profile" class="btn btn-primary"
       ><span class="text">Profile</span></router-link
     >
-<<<<<<< HEAD
-    <router-link to="/home" class="btn btn-primary">
-      <span class="text">Log out </span></router-link
-    >
-=======
     <button @click="logout" class="btn btn-primary">
       <span class="text">Log out</span>
     </button>
->>>>>>> e25fa3068a1915159897595bbcc3919fa665973a
 
     <!-- Add the search bar here -->
     <div class="search-bar">
@@ -46,19 +40,10 @@ export default {
       cardData: [
         { songName: "Song 1", artistName: "Artist 1", rating: "5" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-<<<<<<< HEAD
-        { songName: "Song 3", artistName: "Artist 3", rating: "3" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-
-=======
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
->>>>>>> e25fa3068a1915159897595bbcc3919fa665973a
         // Add more card data as needed
       ],
     };
