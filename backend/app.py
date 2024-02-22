@@ -69,7 +69,7 @@ def login_user():
 
                 if email:
                     session["email"] = email[0]
-
+            print(session)
             return jsonify({"message": "Login successful"}), 200
 
     return jsonify({"error": "Method not allowed"}), 405
@@ -109,15 +109,10 @@ def register_user():
 @app.route("/logout", methods=["POST"])
 def logout_user():
     # Clear the user session
-    session.clear()
-
-    # To remove all client data from Redis (optional)
+    print(session)
     redis_client.flushall()
 
-    # Flash a message for successful logout
-    flash("Logout successful", "success")
-
-    # Return a JSON response indicating successful logout
+    session.clear()
     return jsonify({"message": "Logout successful"}), 200
 
 @app.route("/logoutadmin", methods=["GET", "POST"])
