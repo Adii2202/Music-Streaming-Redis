@@ -8,12 +8,12 @@
     <router-link to="/creator" class="btn btn-primary"
       ><span class="text">Creators Account</span></router-link
     >
-    <router-link to="/home" class="btn btn-primary"
+    <router-link to="/profile" class="btn btn-primary"
       ><span class="text">Profile</span></router-link
     >
-    <router-link to="/home" class="btn btn-primary"
-      ><span class="text">Log out</span></router-link
-    >
+    <button @click="logout" class="btn btn-primary">
+      <span class="text">Log out</span>
+    </button>
 
     <!-- Add the search bar here -->
     <div class="search-bar">
@@ -28,6 +28,8 @@
 
 <script>
 import CardView from "./CardView.vue";
+import axios from "axios";
+
 export default {
   name: "HomeView",
   components: {
@@ -38,15 +40,29 @@ export default {
       cardData: [
         { songName: "Song 1", artistName: "Artist 1", rating: "5" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 3", artistName: "Artist 3", rating: "3" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        { songName: "Song 4", artistName: "Artist 4", rating: "4" },
+        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
+        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
+        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
+        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
         // Add more card data as needed
       ],
     };
+  },
+  methods: {
+    async logout() {
+      try {
+        const response = await axios.post("http://localhost:5000/logout");
+
+        if (response.status === 200) {
+          // Redirect to login page after successful logout
+          this.$router.push("/login");
+        } else {
+          console.error("Logout failed:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    },
   },
 };
 </script>
