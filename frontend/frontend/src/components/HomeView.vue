@@ -41,10 +41,9 @@ export default {
         { songName: "Song 3", artistName: "Artist 3", rating: "3" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        
-        
+
         { songName: "Song 4", artistName: "Artist 4", rating: "4" },
-        
+
         // Add more card data as needed
       ],
     };
