@@ -106,21 +106,19 @@ def register_user():
 
     return jsonify({"error": "Method not allowed"}), 405
 
-
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/logout", methods=["POST"])
 def logout_user():
     # Clear the user session
-    
-    # To remove all client data
-    redis_client.execute_command("FLUSHALL")
     session.clear()
+
+    # To remove all client data from Redis (optional)
+    redis_client.flushall()
 
     # Flash a message for successful logout
     flash("Logout successful", "success")
 
-    # Redirect to the login page
-    return redirect("/loginuser")
-
+    # Return a JSON response indicating successful logout
+    return jsonify({"message": "Logout successful"}), 200
 
 @app.route("/logoutadmin", methods=["GET", "POST"])
 def logout_admin():
