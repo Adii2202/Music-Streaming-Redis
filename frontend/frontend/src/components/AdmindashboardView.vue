@@ -124,8 +124,4 @@ export default {
   border: 0.75px solid #fff; /* White border */
   border-radius: 10px; /* Rounded corners */
 }
-
-.vercel-large-rectangle {
-  /* width: 850px; Double the width to make it visually centered */
-}
 </style>
