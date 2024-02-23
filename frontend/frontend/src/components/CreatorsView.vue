@@ -1,5 +1,6 @@
 <template>
   <div class="vercel-background">
+    <UsernavbarView />
     <div class="creators-container">
       <span class="text-h3 mb-4 font-weight-semibold title"
         >Kick start your journey as a creator</span
@@ -13,8 +14,12 @@
 </template>
 
 <script>
+import UsernavbarView from "./UsernavbarView.vue";
 export default {
   name: "CreatorsView",
+  components: {
+    UsernavbarView,
+  },
 };
 </script>
 
