@@ -136,6 +136,7 @@ def login_admin():
             is_admin = cursor.fetchone()
 
             session["isAdmin"] = is_admin[0] if is_admin else 0
+            session["username"] = username
             return jsonify({"message":"Login Admin Succesfull"}), 200
     return jsonify({"error": "Method not allowed"}), 405
 
