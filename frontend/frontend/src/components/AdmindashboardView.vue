@@ -55,7 +55,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style ¸>
 .justify-space-evenly {
   justify-content: space-evenly;
 }
