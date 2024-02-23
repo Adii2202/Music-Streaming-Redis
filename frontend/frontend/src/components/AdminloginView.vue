@@ -1,7 +1,7 @@
 <template>
   <div class="login-form">
     <h1>Admin Login</h1>
-    <form @submit.prevent="submitLogin">
+    <form @submit.prevent="submitLogin" method="post">
       <div class="form-group">
         <label for="username">Username:</label>
         <input type="text" id="username" v-model="username" required />
@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "AdminloginView",
   data() {
@@ -27,9 +29,22 @@ export default {
     };
   },
   methods: {
-    submitLogin() {
-      console.log("Username:", this.username);
-      console.log("Password:", this.password);
+    async submitLogin() {
+      try {
+        const response = await axios.post("http://localhost:5000/loginadmin", {
+          username: this.username,
+          password: this.password,
+        });
+        if (response.status === 200) {
+          this.$router.push("/dashboard");
+        } else {
+          // Handle error response
+          this.error = response.data.error;
+        }
+      } catch (error) {
+        console.error("Login failed:", error.response.data);
+        this.error = "Login failed. Please check your credentials.";
+      }
     },
   },
 };

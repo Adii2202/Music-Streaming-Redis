@@ -16,11 +16,23 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "AdminnavbarView",
   methods: {
-    logout() {
-      // Your logout logic here
+    async logout() {
+      try {
+        const response = await axios.post("http://localhost:5000/logoutadmin");
+
+        if (response.status === 200) {
+          this.$router.push("/adminlogin");
+        } else {
+          console.error("Logout failed:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
     },
   },
 };

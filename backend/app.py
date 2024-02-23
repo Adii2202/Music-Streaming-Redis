@@ -96,8 +96,7 @@ def register_user():
             return jsonify({"error": "Username already exists, login instead"}), 400
         else:
             # Insert new user into the database
-            cursor.execute(f"INSERT INTO user (name, username, email, password, isAdmin) VALUES ('{name}', '{username}', '{email}', '{password}', '{0}')",
-                           )
+            cursor.execute(f"INSERT INTO user (name, username, email, password, isAdmin) VALUES ('{name}', '{username}', '{email}', '{password}', '{0}')")
             conn.commit()
             session["username"] = username
             session["email"] = email
@@ -115,16 +114,39 @@ def logout_user():
     session.clear()
     return jsonify({"message": "Logout successful"}), 200
 
+
+@app.route("/loginadmin", methods=["GET", "POST"])
+def login_admin():
+    if request.method == "POST":
+        data = request.json
+        username = data.get("username")
+        password = data.get("password")
+        conn = sqlite3.connect('user_data.db')
+        cursor = conn.cursor()
+
+        query = f"SELECT username, password from admin WHERE username = '{username}' AND password = '{password}'"
+        cursor.execute(query)
+
+        results = cursor.fetchall()
+        print(results)
+        if len(results) == 0:
+            return jsonify({"error": "Wrong credentials"}), 400
+        else:
+            cursor.execute(f"SELECT isAdmin FROM admin WHERE username='{username}'")
+            is_admin = cursor.fetchone()
+
+            session["isAdmin"] = is_admin[0] if is_admin else 0
+            session["username"] = username
+            return jsonify({"message":"Login Admin Succesfull"}), 200
+    return jsonify({"error": "Method not allowed"}), 405
+
+
 @app.route("/logoutadmin", methods=["GET", "POST"])
 def logout_admin():
-    # Clear the user session
+    redis_client.flushall()
+
     session.clear()
-
-    # Flash a message for successful logout
-    flash("Logout successful", "success")
-
-    # Redirect to the login page
-    return redirect("/loginadmin")
+    return jsonify({"message": "Logout successful"}), 200
 
 
 @app.route("/userfetchesalbum/<id>", methods=["GET"])
@@ -928,36 +950,6 @@ def delete(id):
         conn.commit()
         return redirect("/tracklist")
     return redirect("/tracklist")
-
-
-@app.route("/loginadmin", methods=["GET", "POST"])
-def login_admin():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        print(username, password)
-
-        # Check credentials against database
-        query = f"SELECT username, password from admin WHERE username = '{username}' AND password = '{password}'"
-        cursor.execute(query)
-
-        results = cursor.fetchall()
-        print(results)
-        if len(results) == 0:
-            print("Sorry for the inconvenience. Wrong credentials provided")
-            return render_template("loginAdmin.html")
-        else:
-            # Retrieve isAdmin for the newly registered admin
-            cursor.execute("SELECT isAdmin FROM admin WHERE username=?", (username,))
-            is_admin = cursor.fetchone()
-
-            # Store isAdmin in the session
-            session["isAdmin"] = is_admin[0] if is_admin else 0
-            print("Login successful!")
-            return redirect("/admin")
-
-    return render_template("loginAdmin.html")
 
 
 @app.route("/registeradmin", methods=["GET", "POST"])
