@@ -1,9 +1,11 @@
 <template>
   <div class="song-card">
-    <span class="song-name">{{ songName }}</span>
-    <span class="artist-name">{{ artistName }}</span>
-    <span class="rating">{{ rating }}</span>
-    <button class="play-button" @click="openModal">Play</button>
+    <div class="pt-12 pl-12 pr-12 pb-4 w-auto">
+      <span class="song-name">{{ songName }}</span>
+      <span class="artist-name">{{ artistName }}</span>
+      <span class="rating">{{ rating }}</span>
+      <button class="play-button" @click="openModal">Play</button>
+    </div>
 
     <!-- Include the PlayModal component -->
     <PlaymodelView
@@ -50,6 +52,7 @@ export default {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  border: 0.25px solid #fff;
 }
 
 .song-name {
@@ -70,17 +73,19 @@ export default {
 }
 
 .play-button {
+  align-items: left;
   padding: 10px 20px;
-  background-color: #1db954; /* Spotify's green color */
-  color: white;
+  margin-top: 10px;
+  background-color: #61dafb; /* Spotify's green color */
+  color: black;
   border: none;
-  border-radius: 50%; /* Make it round */
+  border-radius: 10%; /* Make it round */
   cursor: pointer;
   font-size: 1.2em; /* Slightly larger font size */
   transition: background-color 0.3s ease;
 }
 
 .play-button:hover {
-  background-color: #25a25a; /* Darker shade on hover */
+  background-color: #4fa3d1; /* Darker shade on hover */
 }
 </style>

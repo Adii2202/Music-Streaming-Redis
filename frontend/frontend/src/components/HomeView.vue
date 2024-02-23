@@ -1,29 +1,24 @@
 <template>
-  <div class="vercel-background">
+  <div class="pb-16 vercel-background">
     <UsernavbarView />
-    <!-- <nav class="navbar">
-      <span class="brand">Music Stream</span>
 
-      <router-link to="/home" class="btn btn-primary"
-        ><span class="text">Home</span></router-link
-      >
-      <router-link to="/creator" class="btn btn-primary"
-        ><span class="text">Creators Account</span></router-link
-      >
-      <router-link to="/profile" class="btn btn-primary"
-        ><span class="text">Profile</span></router-link
-      >
-      <button @click="logout" class="btn btn-primary">
-        <span class="text">Log out</span>
-      </button>
+    <div class="mt-12 mb-8 m ml-16 pl-12 text-h6 text">Latest Songs</div>
+    <div class="d-flex flex-row justify-space-around">
+      <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
+    </div>
 
-    
-      <div class="search-bar">
-        <input type="text" placeholder="Search" v-model="searchQuery" />
-        <button @click="search">Search</button>
-      </div>
-    </nav> -->
-    <div class="card-container">
+    <div class="mt-16 mb-8 ml-16 pl-12 text-h6 text">Albums</div>
+    <div class="d-flex flex-row justify-space-around">
+      <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
+    </div>
+
+    <div class="mt-16 mb-8 ml-16 pl-12 text-h6 text">Your playlists</div>
+    <div class="d-flex flex-row justify-space-around">
+      <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
+    </div>
+
+    <div class="mt-16 mb-8 ml-16 pl-12 text-h6 text">Explore Genre</div>
+    <div class="d-flex flex-row justify-space-around">
       <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
     </div>
   </div>
@@ -46,10 +41,6 @@ export default {
         { songName: "Song 1", artistName: "Artist 1", rating: "5" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
         { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        // Add more card data as needed
       ],
     };
   },
@@ -80,17 +71,22 @@ export default {
   align-items: center;
   justify-content: center; */
 }
+
 .card-container {
   overflow-x: auto;
   white-space: nowrap;
   margin-top: 20px;
+  padding: 10px;
   display: flex;
-  justify-content: flex-start;
+  max-width: calc(
+    100vw - 20px
+  ); /* Ensure the container doesn't exceed the viewport width */
+  justify-content: space-between;
 }
 
 .card-container .card-view {
-  flex: 0 0 auto; /* Ensure the cards don't grow and shrink */
-  margin-right: 10px; /* Add some margin between cards */
+  flex: 0 0 calc(25% - 10px); /* Display 4 cards, deducting margins */
+  margin-right: 10px;
 }
 
 .navbar {
