@@ -9,6 +9,9 @@ import CardView from "../components/CardView.vue";
 import CreatorsView from "../components/CreatorsView.vue";
 import UploadsongView from "../components/UploadsongView.vue";
 import AdmindashboardView from "../components/AdmindashboardView.vue";
+import AdmintracksView from "../components/AdmintracksView.vue";
+import ProfileView from "../components/ProfileView.vue";
+import UserdashboardView from "../components/UserdashboardView.vue";
 
 const routes = [
   {
@@ -52,9 +55,25 @@ const routes = [
     component: UploadsongView,
   },
   {
+    path: "/userdash",
+    name: "UserdashboardView",
+    component: UserdashboardView,
+  },
+  // ADMIN
+  {
     path: "/dashboard",
     name: "AdmindashboardView",
     component: AdmindashboardView,
+  },
+  {
+    path: "/tracks",
+    name: "AdmintracksView",
+    component: AdmintracksView,
+  },
+  {
+    path: "/profile",
+    name: "ProfileView",
+    component: ProfileView,
   },
 ];
 
