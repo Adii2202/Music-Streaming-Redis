@@ -1,4 +1,5 @@
 <template>
+  <UsernavbarView />
   <nav class="navbar">
     <span class="brand">Music Stream</span>
 
@@ -29,11 +30,13 @@
 <script>
 import CardView from "./CardView.vue";
 import axios from "axios";
+import UsernavbarView from "./UsernavbarView.vue";
 
 export default {
   name: "HomeView",
   components: {
     CardView,
+    UsernavbarView,
   },
   data() {
     return {
