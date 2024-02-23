@@ -1,35 +1,37 @@
 <template>
-  <UsernavbarView />
-  <nav class="navbar">
-    <span class="brand">Music Stream</span>
+  <div class="vercel-background">
+    <UsernavbarView />
+    <!-- <nav class="navbar">
+      <span class="brand">Music Stream</span>
 
-    <router-link to="/home" class="btn btn-primary"
-      ><span class="text">Home</span></router-link
-    >
-    <router-link to="/creator" class="btn btn-primary"
-      ><span class="text">Creators Account</span></router-link
-    >
-    <router-link to="/profile" class="btn btn-primary"
-      ><span class="text">Profile</span></router-link
-    >
-    <button @click="logout" class="btn btn-primary">
-      <span class="text">Log out</span>
-    </button>
+      <router-link to="/home" class="btn btn-primary"
+        ><span class="text">Home</span></router-link
+      >
+      <router-link to="/creator" class="btn btn-primary"
+        ><span class="text">Creators Account</span></router-link
+      >
+      <router-link to="/profile" class="btn btn-primary"
+        ><span class="text">Profile</span></router-link
+      >
+      <button @click="logout" class="btn btn-primary">
+        <span class="text">Log out</span>
+      </button>
 
-    <!-- Add the search bar here -->
-    <div class="search-bar">
-      <input type="text" placeholder="Search" v-model="searchQuery" />
-      <button @click="search">Search</button>
+    
+      <div class="search-bar">
+        <input type="text" placeholder="Search" v-model="searchQuery" />
+        <button @click="search">Search</button>
+      </div>
+    </nav> -->
+    <div class="card-container">
+      <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
     </div>
-  </nav>
-  <div class="card-container">
-    <CardView v-for="(card, index) in cardData" :key="index" :data="card" />
   </div>
 </template>
 
 <script>
 import CardView from "./CardView.vue";
-import axios from "axios";
+// import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 
 export default {
@@ -51,26 +53,33 @@ export default {
       ],
     };
   },
-  methods: {
-    async logout() {
-      try {
-        const response = await axios.post("http://localhost:5000/logout");
+  // methods: {
+  //   async logout() {
+  //     try {
+  //       const response = await axios.post("http://localhost:5000/logout");
 
-        if (response.status === 200) {
-          // Redirect to login page after successful logout
-          this.$router.push("/login");
-        } else {
-          console.error("Logout failed:", response.data.error);
-        }
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
-    },
-  },
+  //       if (response.status === 200) {
+  //         // Redirect to login page after successful logout
+  //         this.$router.push("/login");
+  //       } else {
+  //         console.error("Logout failed:", response.data.error);
+  //       }
+  //     } catch (error) {
+  //       console.error("Logout error:", error);
+  //     }
+  //   },
+  // },
 };
 </script>
 
 <style scoped>
+.vercel-background {
+  background: linear-gradient(to bottom right, #121415, #303034);
+  min-height: 100vh;
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+}
 .card-container {
   overflow-x: auto;
   white-space: nowrap;
