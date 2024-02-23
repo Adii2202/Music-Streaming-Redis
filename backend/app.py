@@ -142,14 +142,10 @@ def login_admin():
 
 @app.route("/logoutadmin", methods=["GET", "POST"])
 def logout_admin():
-    # Clear the user session
+    redis_client.flushall()
+
     session.clear()
-
-    # Flash a message for successful logout
-    flash("Logout successful", "success")
-
-    # Redirect to the login page
-    return redirect("/loginadmin")
+    return jsonify({"message": "Logout successful"}), 200
 
 
 @app.route("/userfetchesalbum/<id>", methods=["GET"])
