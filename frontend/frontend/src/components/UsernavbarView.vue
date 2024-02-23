@@ -18,7 +18,7 @@
     <!-- Add the search bar here -->
     <div class="search-bar">
       <input type="text" placeholder="Search" v-model="searchQuery" />
-      <button @click="search">Search</button>
+      <button class="button" @click="search">Search</button>
     </div>
   </nav>
   <div class="card-container">
@@ -92,13 +92,14 @@ export default {
 }
 
 .brand {
-  font-size: 1.5em;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .btn {
   margin-left: 10px;
   background-color: #000; /* Vercel's primary button color */
-  color: #fff; /* Text color */
+  color: black; /* Text color */
   border: 1px solid #fff; /* Border color */
   padding: 10px 15px;
   border-radius: 4px;
@@ -117,14 +118,20 @@ export default {
 
 input {
   padding: 5px;
+  border: 0.75px solid #fff;
   margin-right: 5px;
+  color: white;
 }
 
 button {
   padding: 5px 10px;
-  background-color: #4caf50;
-  color: white;
+  background-color: #61dafb;
+  color: black;
   border: none;
   cursor: pointer;
+}
+
+.button:hover {
+  background-color: #4fa3d1; /* Darker shade on hover */
 }
 </style>

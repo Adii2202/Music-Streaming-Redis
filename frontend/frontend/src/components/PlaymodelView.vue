@@ -65,8 +65,8 @@ export default {
 
 .close-button {
   padding: 10px 20px;
-  background-color: #1db954; /* Spotify's green color */
-  color: white;
+  background-color: #61dafb; /* Spotify's green color */
+  color: black;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -75,6 +75,6 @@ export default {
 }
 
 .close-button:hover {
-  background-color: #25a25a; /* Darker shade on hover */
+  background-color: #4fa3d1; /* Darker shade on hover */
 }
 </style>

@@ -1,18 +1,25 @@
 <template>
   <div class="vercel-background">
+    <UsernavbarView />
     <div class="center-container">
       <div class="pt-8 profile-card">
         <div class="role">Role</div>
         <div class="name">Name</div>
-        <button class="home-button">Home</button>
+        <router-link to="/home" class="home-button"
+          ><span class="text">Home</span></router-link
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import UsernavbarView from "./UsernavbarView.vue";
 export default {
   name: "ProfileView",
+  components: {
+    UsernavbarView,
+  },
 };
 </script>
 
@@ -21,7 +28,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 50vh;
 }
 
 .profile-card {
@@ -29,7 +36,7 @@ export default {
   color: white;
   width: 400px;
   height: 200px;
-  padding: 20px;
+  /* padding: 20px; */
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -39,9 +46,9 @@ export default {
 .vercel-background {
   background: linear-gradient(to bottom right, #121415, #303034);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex; */
+  /* justify-content: center;
+  align-items: center; */
 }
 
 .role {
@@ -62,6 +69,7 @@ export default {
   border-radius: 4px;
   padding: 10px 20px;
   cursor: pointer;
+  text-decoration: none;
   transition: background-color 0.3s ease;
 }
 
