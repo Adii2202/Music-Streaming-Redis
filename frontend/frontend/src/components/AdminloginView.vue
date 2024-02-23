@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   name: "AdminloginView",
@@ -33,10 +33,10 @@ export default {
       try {
         const response = await axios.post("http://localhost:5000/loginadmin", {
           username: this.username,
-          password: this.password
+          password: this.password,
         });
         if (response.status === 200) {
-          this.$router.push("#");
+          this.$router.push("/dashboard");
         } else {
           // Handle error response
           this.error = response.data.error;
