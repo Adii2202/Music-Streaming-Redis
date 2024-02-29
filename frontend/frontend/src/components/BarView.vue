@@ -31,6 +31,9 @@ ChartJS.register(
 export default {
   name: "BarView",
   components: { Bar },
+  props: {
+    genreData: Object, // Assuming genreData is an object with genre names as keys and arrays of songs as values
+  },
   computed: {
     myStyles() {
       return {
@@ -39,15 +42,25 @@ export default {
       };
     },
   },
+  watch: {
+    genreData: {
+      handler(newGenreData) {
+        // When genreData changes, update chartData
+        this.updateChartData(newGenreData);
+      },
+      deep: true,
+      immediate: true, // Trigger the handler immediately on component mount
+    },
+  },
   data() {
     return {
       chartData: {
-        labels: ["January", "February", "March"],
+        labels: [],
         datasets: [
           {
-            label: "Data",
-            backgroundColor: ["#4CAF50", "#2196F3", "#FF9800"], // Adjust colors as needed
-            data: [40, 20, 12],
+            label: "Number of Uploads",
+            backgroundColor: "#61dafb", // Adjust color as needed
+            data: [],
           },
         ],
       },
@@ -56,17 +69,34 @@ export default {
         scales: {
           x: {
             grid: {
-              color: "rgba(255, 255, 255, 0.1)", // X-axis grid color
+              color: "rgba(97, 218, 251, 0.1)", // X-axis grid color
             },
           },
           y: {
             grid: {
-              color: "rgba(255, 255, 255, 0.1)", // Y-axis grid color
+              color: "rgba(97, 218, 251, 0.1)", // Y-axis grid color
             },
           },
         },
       },
     };
+  },
+  methods: {
+    updateChartData(newGenreData) {
+      // Extract genre names and song counts from the new genre data
+      const genreNames = Object.keys(newGenreData);
+
+      // Sort genre names based on the number of songs in each genre
+      genreNames.sort(
+        (a, b) => newGenreData[b].length - newGenreData[a].length
+      );
+
+      const songCounts = genreNames.map((genre) => newGenreData[genre].length);
+
+      // Update chartData
+      this.chartData.labels = genreNames;
+      this.chartData.datasets[0].data = songCounts;
+    },
   },
 };
 </script>

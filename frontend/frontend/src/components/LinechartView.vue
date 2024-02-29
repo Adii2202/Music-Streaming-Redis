@@ -1,11 +1,8 @@
-<!-- <template>
-  <div>
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
+<template>
+  <Line :data="chartData" :options="chartOptions" />
 </template>
 
-<script lang="ts">
-import { Line } from "vue-chartjs";
+<script>
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,6 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { Line } from "vue-chartjs";
 
 ChartJS.register(
   CategoryScale,
@@ -35,23 +33,23 @@ export default {
   data() {
     return {
       chartData: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+        labels: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+        ],
         datasets: [
           {
-            label: "Sales",
-            backgroundColor: "#f87979",
+            label: "Data One",
+            backgroundColor: "#61dafb", // Light blue background color
+            borderColor: "#ffffff", // White line color
+            borderWidth: 2, // Line width
+            pointBackgroundColor: "#61dafb", // Light blue dot color
             data: [40, 39, 10, 40, 39, 80, 40],
-            borderColor: "#f87979",
-            pointRadius: 5,
-            pointHoverRadius: 7,
-          },
-          {
-            label: "Expenses",
-            backgroundColor: "#53b87a",
-            data: [20, 25, 30, 25, 30, 50, 25],
-            borderColor: "#53b87a",
-            pointRadius: 5,
-            pointHoverRadius: 7,
           },
         ],
       },
@@ -59,25 +57,25 @@ export default {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
+          x: {
+            grid: {
+              color: "rgba(97, 218, 251, 0.1)", // White grid lines on X-axis
             },
-          ],
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: "bottom",
+            ticks: {
+              color: "#ffffff", // White color for X-axis labels
+            },
           },
-          tooltip: {
-            enabled: true,
+          y: {
+            grid: {
+              color: "rgba(97, 218, 251, 0.1)", // White grid lines on Y-axis
+            },
+            ticks: {
+              color: "#ffffff", // White color for Y-axis labels
+            },
           },
         },
       },
     };
   },
 };
-</script> -->
+</script>

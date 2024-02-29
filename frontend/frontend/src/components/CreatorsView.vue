@@ -56,7 +56,7 @@ export default {
 .upload-button {
   background-color: #61dafb;
   color: white;
-  font-size: 2em;
+  font-size: 2.5em;
   border: none;
   border-radius: 50%;
   width: 80px; /* Set the width and height to the same value */
@@ -65,6 +65,7 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  text-decoration: none;
   transition: background-color 0.3s ease;
 }
 

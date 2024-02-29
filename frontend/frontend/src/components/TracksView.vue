@@ -1,16 +1,33 @@
 <template>
   <div class="ml-4 mt-4 mr-4 vercel-track-view">
-    <span class="text-h6 vercel-title">Title</span>
-    <span class="text-h6 vercel-flagged">isFlagged</span>
-    <button class="vercel-button">View Lyrics</button>
-    <button class="vercel-button">Flag</button>
-    <button class="vercel-button">Delete</button>
+    <span class="text-h6 vercel-title">{{ song.title }}</span>
+    <span class="text-h6 vercel-flagged">{{ song.isFlagged }}</span>
+    <button class="vercel-button" @click="viewLyrics">View Lyrics</button>
+    <button class="vercel-button" @click="flagTrack">Flag</button>
+    <button class="vercel-button" @click="deleteTrack">Delete</button>
   </div>
 </template>
 
 <script>
 export default {
   name: "TracksView",
+  props: {
+    song: Object, // Define song as a prop
+  },
+  methods: {
+    viewLyrics() {
+      // Handle view lyrics logic
+      console.log("View Lyrics clicked");
+    },
+    flagTrack() {
+      // Handle flag track logic
+      console.log("Flag clicked");
+    },
+    deleteTrack() {
+      // Handle delete track logic
+      console.log("Delete clicked");
+    },
+  },
 };
 </script>
 
@@ -25,6 +42,12 @@ export default {
   color: #fff;
   border-radius: 10px;
   border: 0.01px solid #fff;
+}
+
+.vercel-track-view:hover {
+  transform: scale(1.05); /* Increase the scale on hover */
+  transition: transform 0.5s ease; /* Add a smooth transition effect */
+  box-shadow: 0 16px 24px rgba(255, 255, 255, 0.2);
 }
 
 .vercel-title {

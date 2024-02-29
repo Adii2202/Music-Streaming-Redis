@@ -43,6 +43,12 @@ export default {
   align-items: center;
 }
 
+.profile-card:hover {
+  transform: scale(1.05); /* Increase the scale on hover */
+  transition: transform 0.5s ease; /* Add a smooth transition effect */
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+}
+
 .vercel-background {
   background: linear-gradient(to bottom right, #121415, #303034);
   min-height: 100vh;
