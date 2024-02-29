@@ -12,7 +12,7 @@ import TracksView from "./TracksView.vue";
 export default {
   name: "GenreView",
   props: {
-    genreSongs: Array, // Pass an array of songs for the specific genre
+    genreSongs: Array,
   },
   components: {
     TracksView,

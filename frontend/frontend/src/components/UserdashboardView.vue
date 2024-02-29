@@ -1,9 +1,11 @@
 <template>
-  <div class="vercel-background">
+  <div class="pt-16 pb-16 vercel-background">
     <div class="dashboard-container">
       <div class="dashboard-section">
-        <div class="d-flex flex-row justify-space-between">
-          <div class="dashboard-section-1 dashboard-item">c01</div>
+        <div class="dashboard-section-2 d-flex flex-row justify-space-around">
+          <div class="pl-12 pr-12 pb-12 pt-12 dashboard-item">
+            <LinechartView />
+          </div>
         </div>
         <div class="dashboard-section-1">
           <div
@@ -21,58 +23,112 @@
         </div>
       </div>
 
-      <div class="dashboard-section-1">
+      <div class="mb-16 dashboard-section-1">
         <div>
           <div class="mt-12 text-h4 text">
-            Tracks
+            <div class="d-flex flex justify-space-between">
+              <div>Tracks</div>
+              <div>
+                <router-link to="/upload" class="text-h6 upload-button">
+                  Upload song
+                </router-link>
+              </div>
+            </div>
             <div class="transprent mt-8" v-if="tracks.length > 0">
               <UsersongalbumView :items="tracks" />
             </div>
-            <div class="transprent text mt-8" v-else>No tracks available</div>
+            <div class="transprent mt-8" v-else>No tracks available</div>
           </div>
         </div>
         <div>
-          <div class="mt-12 text-h4 text">Albums</div>
-          <div class="transprent mt-8" v-if="albums.length > 0">
-            <UsersongalbumView :items="albums" />
+          <div class="mt-12 text-h4 text">
+            <div class="d-flex flex justify-space-between">
+              <div>Albums</div>
+              <div>
+                <router-link to="/upload" class="text-h6 upload-button">
+                  Create album
+                </router-link>
+              </div>
+            </div>
+            <div class="transprent mt-8" v-if="albums.length > 0">
+              <UsersongalbumView :items="albums" />
+            </div>
+            <div class="transprent mt-8" v-else>No albums available</div>
           </div>
-          <div class="transprent text mt-8" v-else>No albums available</div>
         </div>
       </div>
     </div>
+    <CurrentplaybarView />
   </div>
 </template>
 
 <script>
-// import LinechartView from "./LinechartView.vue";
+import LinechartView from "./LinechartView.vue";
 import UsersongalbumView from "./UsersongalbumView.vue";
+import CurrentplaybarView from "./CurrentplaybarView.vue";
 export default {
   name: "UserdashboardView",
   components: {
-    // LinechartView,
     UsersongalbumView,
+    LinechartView,
+    CurrentplaybarView,
   },
   data() {
+    const tracks = [
+      { title: "Song 1", date: "2022-03-01" },
+      { title: "Song 2", date: "2022-03-02" },
+    ];
+
+    const albums = [
+      { title: "Song 1", date: "2022-03-01" },
+      { title: "Song 2", date: "2022-03-02" },
+      { title: "Song 2", date: "2022-03-02" },
+    ];
+
     return {
-      songCount: 3, // Replace with your actual song count
-      albumCount: 3, // Replace with your actual album count
-      tracks: [
-        [1, 1],
-        [4, 3],
-      ], // Replace with your actual tracks array
-      albums: [],
+      tracks,
+      albums,
+      songCount: tracks.length, // Replace with your actual song count
+      albumCount: albums.length, // Replace with your actual album count
     };
   },
 };
 </script>
-
 <style scoped>
+.upload-button {
+  align-items: left;
+  padding: 10px 10px;
+  margin-top: 10px;
+  background-color: #61dafb; /* Spotify's green color */
+  color: black;
+  border: none;
+  border-radius: 4%; /* Make it round */
+  cursor: pointer;
+  /* font-size: 1.2em */
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #4fa3d1; /* Darker shade on hover */
+}
 .vercel-background {
   background: linear-gradient(to bottom right, #121415, #303034);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* 
+.dashboard-section-1 {
+  flex: 2;
+} */
+
+.dashboard-section-2 {
+  flex: 2;
+}
+.dashboard-item {
+  flex: 0 0 75%;
 }
 
 .transprent {
@@ -120,7 +176,6 @@ export default {
   display: flex;
   justify-content: space-around;
   margin: 20px 0;
-  flex: 1;
 }
 
 .dashboard-item {

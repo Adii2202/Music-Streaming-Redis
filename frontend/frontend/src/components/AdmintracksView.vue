@@ -26,6 +26,8 @@
 <script>
 import GenerView from "./GenerView.vue";
 import AdminnavbarView from "./AdminnavbarView.vue";
+// import BarView from "./BarView.vue";
+
 // import TracksView from "../components/TracksView.vue";
 export default {
   name: "AdmintracksView",
@@ -33,12 +35,14 @@ export default {
     // TracksView,
     GenerView,
     AdminnavbarView,
+    // BarView,
   },
   data() {
     return {
       genreData: {
         rockSongs: [
           { id: 1, title: "Rock Song 1", isFlagged: false },
+          { id: 2, title: "Rock Song 2", isFlagged: true },
           { id: 2, title: "Rock Song 2", isFlagged: true },
           // Add more songs as needed
         ],
@@ -53,6 +57,22 @@ export default {
     };
   },
   methods: {
+    generateChartData(songs) {
+      // Generate chart data based on the number of songs
+      const labels = songs.map((song) => song.title);
+      const data = songs.map((song) => song.isFlagged);
+
+      return {
+        labels,
+        datasets: [
+          {
+            label: "Flagged Songs",
+            backgroundColor: "#4CAF50", // Adjust color as needed
+            data,
+          },
+        ],
+      };
+    },
     search() {
       // Your search logic here
     },
