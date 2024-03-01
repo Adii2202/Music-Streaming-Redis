@@ -11,61 +11,61 @@
 </template>
 
 <script>
-import { Howl } from "howler";
+// import { Howl } from "howler";
 
-export default {
-  name: "CurrentplayView",
-  data() {
-    return {
-      player: null,
-      currentSong: "",
-      isFixed: false,
-      isPlaying: false, // Add this line to initialize isPlaying
-    };
-  },
-  methods: {
-    togglePlayPause() {
-      if (this.player) {
-        if (this.player.playing()) {
-          this.player.pause();
-        } else {
-          this.player.play();
-        }
-        this.isPlaying = !this.isPlaying;
-      }
-    },
-    updateCurrentSong(songTitle) {
-      this.currentSong = songTitle;
-      localStorage.setItem("currentSong", songTitle);
-    },
-    handleScroll() {
-      const musicBarRect = this.$el.getBoundingClientRect();
-      this.isFixed = musicBarRect.bottom <= window.innerHeight;
-    },
-  },
-  mounted() {
-    window.addEventListener("scroll", this.handleScroll);
-    // Initialize your music player
-    this.player = new Howl({
-      src: ["path/to/your/song.mp3"],
-      // Additional player settings
-    });
+// export default {
+//   name: "CurrentplayView",
+//   data() {
+//     return {
+//       player: null,
+//       currentSong: "",
+//       isFixed: false,
+//       isPlaying: false, // Add this line to initialize isPlaying
+//     };
+//   },
+//   methods: {
+//     togglePlayPause() {
+//       if (this.player) {
+//         if (this.player.playing()) {
+//           this.player.pause();
+//         } else {
+//           this.player.play();
+//         }
+//         this.isPlaying = !this.isPlaying;
+//       }
+//     },
+//     updateCurrentSong(songTitle) {
+//       this.currentSong = songTitle;
+//       localStorage.setItem("currentSong", songTitle);
+//     },
+//     handleScroll() {
+//       const musicBarRect = this.$el.getBoundingClientRect();
+//       this.isFixed = musicBarRect.bottom <= window.innerHeight;
+//     },
+//   },
+//   mounted() {
+//     window.addEventListener("scroll", this.handleScroll);
+//     // Initialize your music player
+//     this.player = new Howl({
+//       src: ["path/to/your/song.mp3"],
+//       // Additional player settings
+//     });
 
-    // Set up an event listener for when the song changes
-    this.player.on("play", () => {
-      this.updateCurrentSong("Your Song Title"); // Update with actual song information
-    });
+//     // Set up an event listener for when the song changes
+//     this.player.on("play", () => {
+//       this.updateCurrentSong("Your Song Title"); // Update with actual song information
+//     });
 
-    // Save and retrieve the current song state using local storage
-    if (localStorage.getItem("currentSong")) {
-      this.updateCurrentSong(localStorage.getItem("currentSong"));
-    }
-  },
-  beforeUnmount() {
-    // Remove the scroll event listener when the component is destroyed
-    window.removeEventListener("scroll", this.handleScroll);
-  },
-};
+//     // Save and retrieve the current song state using local storage
+//     if (localStorage.getItem("currentSong")) {
+//       this.updateCurrentSong(localStorage.getItem("currentSong"));
+//     }
+//   },
+//   beforeUnmount() {
+//     // Remove the scroll event listener when the component is destroyed
+//     window.removeEventListener("scroll", this.handleScroll);
+//   },
+// };
 </script>
 
 <style scoped>

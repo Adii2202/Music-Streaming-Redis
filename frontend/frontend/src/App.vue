@@ -1,9 +1,9 @@
 <template>
+  <div id="app"><router-view /></div>
   <!-- <nav></nav> -->
-  <router-view />
 </template>
 
-<!-- <style>
+<style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -14,10 +14,9 @@
 
 nav a {
   font-weight: bold;
-
 }
 
 nav a.router-link-exact-active {
   color: #42b983;
 }
-</style> -->
+</style>

@@ -38,7 +38,7 @@ app.config["UPLOAD_FOLDER"] = "uploads"
 server_session = Session(app)
 
 @app.route("/loginuser", methods=["POST"])
-def login_user():
+def login_user():   
     if request.method == "POST":
         data = request.json
         username = data.get("username")
@@ -245,11 +245,16 @@ def create_playlist():
     return render_template("playlistcreate.html")
 
 @app.route("/")
+# def fetch():
+#     if "username" in session : 
+#         print("hehehehehe")
+#         return jsonify({"message":"helloo"}), 200
+#     return jsonify({"error":"Kindly login"}), 401
 def fetchedsongdata():
     try:
-        if "username" not in session or session["username"] is None:
+        if "username" not in session:
             # Redirect to the login page if the username is not in the session or is None
-            return redirect("/loginuser")
+            return jsonify({"error":"Kindly login"}), 401
 
         conn = sqlite3.connect("user_data.db", check_same_thread=False)
         cursor = conn.cursor()
@@ -259,8 +264,6 @@ def fetchedsongdata():
         )
         uploadsong_ids = cursor.fetchall()
         uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
-        print(uploadsong_ids)
-        print("\n")
 
         # Initialize songs list
         songs = []
@@ -283,16 +286,12 @@ def fetchedsongdata():
                 song = tuple(song)
                 songs.append(song)
 
-        print(songs)
-
         # Fetch unrated songs
         cursor.execute(
             "SELECT * FROM uploadsong WHERE uploadsong_id NOT IN (SELECT uploadsong_id FROM Likes)"
         )
         unrated_songs = cursor.fetchall()
         songs.extend(unrated_songs)
-
-        print(songs)
 
         cursor.execute("SELECT * FROM Albums")
         albums_data = cursor.fetchall()
@@ -303,37 +302,34 @@ def fetchedsongdata():
         cursor.execute("SELECT DISTINCT artist FROM uploadsong")
         artist_date_data = cursor.fetchall()
 
-        albums_data = [album for album in albums_data]
-        print(albums_data)
-
         username = session["username"]
         cursor.execute(
             "SELECT Playlist_ID, name FROM Playlists WHERE username = ?", (username,)
         )
         playlists = cursor.fetchall()
-        playlists = [playlist for playlist in playlists]
 
-        return render_template(
-            "home.html",
-            data=songs,
-            album_data=albums_data,
-            genre_data=genre_data,
-            artist_date_data=artist_date_data,
-            playlists=playlists,
-        )
+        # Format the data into a dictionary
+        data = {
+            "songs": songs,
+            "albums_data": albums_data,
+            "genre_data": genre_data,
+            "artist_date_data": artist_date_data,
+            "playlists": playlists
+        }
+
+        return jsonify(data)
 
     except KeyError as key_error:
-        return f"KeyError: {str(key_error)}: 'username' key not found in session"
+        return jsonify({"error": f"KeyError: {str(key_error)}: 'username' key not found in session"})
     
     except sqlite3.Error as sqlite_error:
-        return f"SQLite error: {str(sqlite_error)}"
+        return jsonify({"error": f"SQLite error: {str(sqlite_error)}"})
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return jsonify({"error": f"Error: {str(e)}"})
 
     finally:
         conn.close()
-
 
 @app.route("/uploadsong", methods=["GET", "POST"])
 def upload():

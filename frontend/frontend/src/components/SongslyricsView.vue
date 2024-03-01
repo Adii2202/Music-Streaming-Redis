@@ -178,10 +178,6 @@ export default {
   margin-bottom: 20px;
 }
 
-.lyrics {
-  /* Add styling for lyrics display area */
-}
-
 .lyrics p {
   margin-bottom: 8px;
 }
