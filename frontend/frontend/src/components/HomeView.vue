@@ -14,9 +14,9 @@
           />
         </div>
       </div>
-      <!-- Latest Songs -->
+      <!-- Most Rated Songs -->
       <div class="section">
-        <div class="text section-title">Latest Songs</div>
+        <div class="text section-title">Most Rated Songs</div>
         <div class="card-container">
           <CardView
             v-for="(card, index) in cardData"

@@ -30,7 +30,7 @@
 
       <div class="form-group">
         <label>Date</label>
-        <input type="text" placeholder="Date" />
+        <input type="date" placeholder="Date" />
       </div>
 
       <div class="form-group">
@@ -39,20 +39,74 @@
       </div>
 
       <div class="form-group">
-        <label>Description</label>
+        <label>Lyrics</label>
         <textarea></textarea>
       </div>
 
       <div class="d-flex flex-row justify-center">
-        <button type="button">Upload</button>
+        <button type="submit">Upload</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "UploadsongView",
+  data() {
+    return {
+      title: "",
+      artist: "",
+      genre: "",
+      duration: "",
+      album_name: "",
+      date: "",
+      lyrics: "",
+      file: null,
+    };
+  },
+  methods: {
+    async uploadSong() {
+      const formData = new FormData();
+      formData.append("title", this.title);
+      formData.append("artist", this.artist);
+      formData.append("genre", this.genre);
+      formData.append("duration", this.duration);
+      formData.append("album_name", this.album_name);
+      formData.append("date", this.date);
+      formData.append("file", this.file);
+      formData.append("lyrics", this.lyrics);
+
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/uploadsong",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        alert(response.data.message);
+        // Optionally, reset form fields
+        this.title = "";
+        this.artist = "";
+        this.genre = "";
+        this.duration = "";
+        this.album_name = "";
+        this.date = "";
+        this.lyrics = "";
+        this.file = null;
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while uploading the song.");
+      }
+    },
+    onFileChange(event) {
+      this.file = event.target.files[0];
+    },
+  },
 };
 </script>
 
