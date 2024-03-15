@@ -439,15 +439,10 @@ def creatorsdash():
     average_ratings = {
         date: sum(ratings) / len(ratings) for date, ratings in ratings_by_date.items()
     }
-    print(average_ratings)
+    
     formatted_ratings = {
         date: round(rating, 3) for date, rating in average_ratings.items()
     }
-
-    dates = list(formatted_ratings.keys())
-    ratings = list(formatted_ratings.values())
-    for date, average_rating in average_ratings.items():
-        print(f"Date: {date}, Average Rating: {average_rating}")
 
     if "email" in session:
         email = session["email"]
@@ -463,12 +458,12 @@ def creatorsdash():
 
         title_count = cursor.fetchone()[0]
 
-        print(f"Creator ID: {creator_id[0]}, Songs Count: {title_count}")
     creator_id = creator_ids[0]
     cursor.execute("SELECT * FROM uploadsong WHERE creator_id = ?", creator_id)
     songs = cursor.fetchall()
     cursor.execute("SELECT * FROM Albums WHERE Album_ID = ?", creator_id)
     albums = cursor.fetchall()
+
     for creator_id in creator_ids:
         cursor.execute(
             "SELECT album_id FROM uploadsong WHERE creator_id = ?", creator_id
@@ -483,21 +478,19 @@ def creatorsdash():
 
             album_name_count = cursor.fetchone()[0]
 
-            print(
-                f"Creator ID: {creator_id[0]}, Album ID: {album_id[0]}, Album Name Count: {album_name_count}"
-            )
     songs = [song for song in songs]
     albums = [album for album in albums]
-    print(albums)
-    return render_template(
-        "creatordash.html",
-        dates=dates,
-        ratings=ratings,
-        title_count=title_count,
-        album_count=album_name_count,
-        songs=songs,
-        albums=albums,
-    )
+
+    data = {
+        "dates": list(formatted_ratings.keys()),
+        "ratings": list(formatted_ratings.values()),
+        "title_count": title_count,
+        "album_count": album_name_count,
+        "songs": songs,
+        "albums": albums,
+    }
+
+    return jsonify(data)
 
 
 @app.route("/uploads/<filename>", methods=["GET"])
@@ -699,33 +692,32 @@ from functools import wraps
 def admin():
     is_admin = session.get("isAdmin")
     print(is_admin)
-    # If 'isAdmin' is not present or is not equal to 1, redirect to loginuser.html
+
+    # If 'isAdmin' is not present or is not equal to 1, return a JSON response indicating unauthorized access
     if is_admin is None or is_admin != 1:
-        return redirect("/loginadmin")
+        return jsonify({"error": "Unauthorized access"})
+
     current_date = datetime.now().strftime("%Y-%m-%d")
 
-    # Query to get genre counts
     cursor.execute(
         "SELECT genre, COUNT(*) as genre_count FROM uploadsong WHERE date <= ? GROUP BY genre",
         (current_date,),
     )
     genre_counts = cursor.fetchall()
 
-    # Query to get the total number of genres
     cursor.execute(
         "SELECT COUNT(DISTINCT genre) as total_genres FROM uploadsong WHERE date <= ?",
         (current_date,),
     )
-    total_genres = cursor.fetchone()[0]  # Access the count using index 0
+    total_genres = cursor.fetchone()[0]
 
     cursor.execute("SELECT COUNT(*) as total_filenames FROM uploadsong")
-    total_filenames = cursor.fetchone()[0]  # Access the count using index 0
+    total_filenames = cursor.fetchone()[0]
 
-    # Query to get the count of distinct album_id entries
     cursor.execute(
         "SELECT COUNT(DISTINCT album_id) as total_albums FROM Albums",
     )
-    total_albums = cursor.fetchone()[0]  # Access the count using index 0
+    total_albums = cursor.fetchone()[0]
 
     print(total_filenames, total_albums)
 
@@ -752,7 +744,6 @@ def admin():
         print(f"{genre}: {count}")
     sorted_genre_counts = dict(sorted(genre_counts.items()))
 
-    # Convert the dictionary into separate lists for chart rendering
     chart_categories = list(sorted_genre_counts.keys())
     chart_data = list(sorted_genre_counts.values())
 
@@ -775,12 +766,11 @@ def admin():
         )
         album_counts[month] = cursor.fetchone()[0]
 
-        filename_data = list(filename_counts.values())
-        album_data = list(album_counts.values())
+    filename_data = list(filename_counts.values())
+    album_data = list(album_counts.values())
 
     today_date = datetime.now().strftime("%Y-%m-%d")
 
-    # Query to get the top 10 ratings for today
     cursor.execute(
         """
         SELECT uploadsong_id
@@ -795,10 +785,9 @@ def admin():
     top_ratings_ids = cursor.fetchall()
     print("top rating ids")
     print(top_ratings_ids)
-    # Extract the uploadsong_id values from the result
+
     uploadsong_ids = [row[0] for row in top_ratings_ids]
 
-    # Query to get the titles from the uploadsong table using the uploadsong_ids
     cursor.execute(
         """
         SELECT title
@@ -824,19 +813,22 @@ def admin():
     print(f"User Count: {user_count}")
     print(f"Creator Count: {creator_count}")
 
-    return render_template(
-        "admin.html",
-        filename_counts=filename_counts,
-        album_counts=album_counts,
-        user_count=user_count,
-        creator_count=creator_count,
-        chart_categories=chart_categories,
-        chart_data=chart_data,
-        total_genres=total_genres,
-        total_filenames=total_filenames,
-        total_albums=total_albums,
-        top_ratings_titles=titles,
-    )
+    # Construct a dictionary with the data you want to return
+    data = {
+        "filename_counts": filename_counts,
+        "album_counts": album_counts,
+        "user_count": user_count,
+        "creator_count": creator_count,
+        "chart_categories": chart_categories,
+        "chart_data": chart_data,
+        "total_genres": total_genres,
+        "total_filenames": total_filenames,
+        "total_albums": total_albums,
+        "top_ratings_titles": [title[0] for title in titles],
+    }
+
+    # Return the data as a JSON response
+    return jsonify(data)
 
 
 @app.route("/creator", methods=["GET", "POST"])
@@ -894,8 +886,8 @@ def tracklist():
             genre_songs[genre] = songs
 
         print(genre_songs)
-        return render_template("adminflag.html", genresnsongs=genre_songs)
-    return render_template("adminflag.html")
+        # Use jsonify to convert the dictionary to JSON format
+        return jsonify(genre_songs)
 
 
 @app.route("/flagunflag/<id>", methods=["GET", "POST"])
