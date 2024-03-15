@@ -107,13 +107,11 @@ def register_user():
 
 @app.route("/logout", methods=["POST"])
 def logout_user():
-    # Clear the user session
     print(session)
     redis_client.flushall()
 
     session.clear()
     return jsonify({"message": "Logout successful"}), 200
-
 
 @app.route("/loginadmin", methods=["GET", "POST"])
 def login_admin():
@@ -331,84 +329,71 @@ def fetchedsongdata():
     finally:
         conn.close()
 
-@app.route("/uploadsong", methods=["GET", "POST"])
+@app.route("/uploadsong", methods=["POST"])
 def upload():
-    if request.method == "GET":
-        if "email" in session:
-            return render_template("uploadsong.html")
-        else:
-            return render_template("uploadsong.html", message="Please login first")
-    if request.method == "POST":
-        title = request.form["title"]
-        artist = request.form["artist"]
-        genre = request.form["genre"]
-        duration = request.form["duration"]
-        Album_name = request.form["album_name"]
-        date = request.form["date"]
-        uploaded_file = request.files["file"]
-        filename = uploaded_file.filename
-        lyrics = request.form["lyrics"]
-        cursor.execute("SELECT creator_id FROM creator WHERE artist = ?", (artist,))
-        creator_id = cursor.fetchone()
+    title = request.form["title"]
+    artist = request.form["artist"]
+    genre = request.form["genre"]
+    duration = request.form["duration"]
+    album_name = request.form["album_name"]
+    date = request.form["date"]
+    uploaded_file = request.files["file"]
+    filename = uploaded_file.filename
+    lyrics = request.form["lyrics"]
 
-        if creator_id is not None:
-            creator_id = creator_id[0]
-        else:
-            return render_template(
-                "uploadsong.html", error="Please register as a creator first"
-            )
+    cursor.execute("SELECT creator_id FROM creator WHERE artist = ?", (artist,))
+    creator_id = cursor.fetchone()
 
+    if creator_id is not None:
+        creator_id = creator_id[0]
+    else:
+        return jsonify({"error": "Please register as a creator first"}), 400
+
+    cursor.execute(
+        "SELECT Album_ID FROM Albums WHERE Album_name = ? AND Artist_ID = ? ",
+        (
+            album_name,
+            creator_id,
+        ),
+    )
+    album_id = cursor.fetchone()
+    if album_id is not None:
+        album_id = album_id[0]
+    else:
         cursor.execute(
-            "SELECT Album_ID FROM Albums WHERE Album_name = ? AND Artist_ID = ? ",
+            "INSERT INTO Albums (Artist_ID, Album_name, Release_Date) VALUES (?, ?, ?)",
             (
-                Album_name,
                 creator_id,
-            ),
-        )
-        album_id = cursor.fetchone()
-        if album_id is not None:
-            album_id = album_id[0]
-        else:
-            # creating new album if album not found, giving attributes Artist_ID, Album_name and Release_Date ( same as songs date)
-            cursor.execute(
-                "INSERT INTO Albums (Artist_ID, Album_name, Release_Date) VALUES (?, ?, ?)",
-                (
-                    creator_id,
-                    Album_name,
-                    date,
-                ),
-            )
-            return render_template(
-                "uploadsong.html",
-                message="Album not found, created one new by the name '"
-                + Album_name
-                + "' for you, now upload song with this album name if you want to add more songs to this album",
-            )
-
-        if filename != "":
-            filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + filename
-            print(filename)
-            uploaded_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        else:
-            return render_template("uploadsong.html", message="Please upload a file")
-        cursor.execute(
-            "INSERT INTO uploadsong (title, artist, genre, duration, date, filename, lyrics, isFlagged, creator_id, album_id) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
-            (
-                title,
-                artist,
-                genre,
-                duration,
+                album_name,
                 date,
-                filename,
-                lyrics,
-                creator_id,
-                album_id,
             ),
         )
         conn.commit()
-        # conn.close()
-        return render_template("uploadsong.html", message="Song uploaded successfully")
-    
+        return jsonify({"message": f"Album '{album_name}' created successfully"}), 200
+
+    if filename != "":
+        filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + filename
+        uploaded_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    else:
+        return jsonify({"message": "Please upload a file"}), 400
+
+    cursor.execute(
+        "INSERT INTO uploadsong (title, artist, genre, duration, date, filename, lyrics, isFlagged, creator_id, album_id) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+        (
+            title,
+            artist,
+            genre,
+            duration,
+            date,
+            filename,
+            lyrics,
+            creator_id,
+            album_id,
+        ),
+    )
+    conn.commit()
+    return jsonify({"message": "Song uploaded successfully"}), 200
+
 
 @app.route("/genre/<id>", methods=["GET"])
 def genre(id):
