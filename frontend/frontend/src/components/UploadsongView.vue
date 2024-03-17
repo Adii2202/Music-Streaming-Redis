@@ -1,41 +1,50 @@
 <template>
   <div class="pt-12 vercel-background">
-    <form class="pl-8 pr-8 pt-8 pd-12 upload-song-form">
+    <form
+      @submit.prevent="uploadSong"
+      method="post"
+      class="pl-8 pr-8 pt-8 pd-12 upload-song-form"
+    >
       <div class="d-flex flex-row justify-space-between">
         <div class="form-group">
           <label>Title</label>
-          <input type="text" placeholder="Title" />
+          <input name="title" type="text" placeholder="Title" />
         </div>
 
         <div class="form-group">
           <label>Artist</label>
-          <input type="text" placeholder="Artist" />
+          <input name="artist" type="text" placeholder="Artist" />
         </div>
       </div>
 
       <div class="form-group">
         <label>Genre</label>
-        <input type="text" placeholder="Genre" />
+        <input name="genre" type="text" placeholder="Genre" />
       </div>
 
       <div class="form-group">
         <label>Duration</label>
-        <input type="text" placeholder="Duration" />
+        <input name="duration" type="text" placeholder="Duration" />
       </div>
 
       <div class="form-group">
         <label>Album Name</label>
-        <input type="text" placeholder="Album Name" />
+        <input name="Album_name" type="text" placeholder="Album Name" />
       </div>
 
       <div class="form-group">
         <label>Date</label>
-        <input type="date" placeholder="Date" />
+        <input name="date" type="date" placeholder="Date" />
       </div>
 
       <div class="form-group">
         <label>Upload File</label>
-        <input type="file" />
+        <input
+          name="lyrics"
+          type="file"
+          @change="onFileChange"
+          accept="audio/mpeg"
+        />
       </div>
 
       <div class="form-group">
@@ -60,10 +69,10 @@ export default {
       artist: "",
       genre: "",
       duration: "",
-      album_name: "",
+      Album_name: "",
       date: "",
       lyrics: "",
-      file: null,
+      uploaded_file: null,
     };
   },
   methods: {
@@ -73,9 +82,9 @@ export default {
       formData.append("artist", this.artist);
       formData.append("genre", this.genre);
       formData.append("duration", this.duration);
-      formData.append("album_name", this.album_name);
+      formData.append("Album_name", this.Album_name);
       formData.append("date", this.date);
-      formData.append("file", this.file);
+      formData.append("uploaded_file", this.uploaded_file);
       formData.append("lyrics", this.lyrics);
 
       try {
@@ -88,16 +97,9 @@ export default {
             },
           }
         );
+        console.log(response);
         alert(response.data.message);
-        // Optionally, reset form fields
-        this.title = "";
-        this.artist = "";
-        this.genre = "";
-        this.duration = "";
-        this.album_name = "";
-        this.date = "";
-        this.lyrics = "";
-        this.file = null;
+        this.$router.push("/creator");
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while uploading the song.");
