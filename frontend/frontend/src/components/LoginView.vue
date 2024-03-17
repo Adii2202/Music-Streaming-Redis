@@ -10,6 +10,7 @@
             type="text"
             id="username"
             v-model="username"
+            class="input-text"
             required
           />
         </div>
@@ -20,6 +21,7 @@
             type="password"
             id="password"
             v-model="password"
+            class="input-text"
             required
           />
         </div>
@@ -108,6 +110,9 @@ label {
   font-weight: 600;
   margin-bottom: 8px;
   color: #333;
+}
+.input-text {
+  color: white;
 }
 
 input {

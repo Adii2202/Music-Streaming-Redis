@@ -99,7 +99,7 @@ export default {
         );
         console.log(response);
         alert(response.data.message);
-        this.$router.push("/creator");
+        this.$router.push("/userdash");
       } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while uploading the song.");
