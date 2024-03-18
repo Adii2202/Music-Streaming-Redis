@@ -9,6 +9,8 @@ from flask import (
     flash,
     session,
 )
+from datetime import datetime
+from celery import Celery
 from flask_cors import CORS
 from collections import defaultdict
 from datetime import datetime
@@ -17,22 +19,140 @@ import sqlite3
 import os
 import redis
 from flask_session import Session
-
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:8080"])
 app.secret_key = "__privatekey__"
 app.static_folder = "static"
-# app.config['SESSION_TYPE'] = 'redis'
-# app.config['SESSION_PERMANENT'] = False
-# app.config['SESSION_USE_SIGNER'] = True
-# app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
 
-# redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+
+simple_app = Celery('simple_worker', broker='redis://127.0.0.1:6379/0', backend='redis://127.0.0.1:6379/0')
 
 conn = sqlite3.connect("user_data.db", check_same_thread=False)
 cursor = conn.cursor()
+
 app.config["UPLOAD_FOLDER"] = "uploads"
+
 session = {}
+# simple_app.conf.update(app.config)
+redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+
+@simple_app.task
+def fetch_recent_songs(uploadsong_id):
+    try:
+        conn = sqlite3.connect("user_data.db")
+        cursor = conn.cursor()
+
+        # Check if uploadsong_id exists in Recent_songs
+        cursor.execute("SELECT * FROM Recent_songs WHERE uploadsong_id = ?", (uploadsong_id,))
+        existing_record = cursor.fetchone()
+
+        if existing_record:
+            # Update the record with the current datetime
+            current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute("UPDATE Recent_songs SET date = ? WHERE uploadsong_id = ?", (current_datetime, uploadsong_id))
+        else:
+            # Insert new record with current datetime
+            current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute("INSERT INTO Recent_songs (uploadsong_id, date) VALUES (?, ?)", (uploadsong_id, current_datetime))
+        
+        conn.commit()  # Commit changes
+        conn.close()
+        
+        return {"message": "Recent songs updated successfully."}
+    
+    except sqlite3.Error as sqlite_error:
+        return {"error": f"SQLite error: {str(sqlite_error)}"}
+    except Exception as e:
+        return {"error": f"Error: {str(e)}"}
+
+
+@app.route("/")
+def fetchedsongdata():
+    try:
+        if "username" not in session:
+            return jsonify({"error":"Kindly login"}), 401
+        data = request.json
+        uploadsongid = data.get("uploadsong_id")
+        recent_songs_result = fetch_recent_songs(uploadsongid)
+
+        conn = sqlite3.connect("user_data.db")
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT uploadsong_id, AVG(rating) FROM Likes GROUP BY uploadsong_id ORDER BY AVG(rating) DESC"
+        )
+        uploadsong_ids = cursor.fetchall()
+        uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
+
+        songs = []
+
+        for uploadsong_id in uploadsong_ids:
+            conn = sqlite3.connect("user_data.db", check_same_thread=False)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT * FROM uploadsong WHERE uploadsong_id = ?", (uploadsong_id,)
+            )
+            song = cursor.fetchone()
+            cursor.execute(
+                "SELECT AVG(rating) FROM Likes WHERE uploadsong_id = ?",
+                (uploadsong_id,),
+            )
+            avg_rating = cursor.fetchone()
+            avg_rating = avg_rating[0] if avg_rating is not None else 0
+
+            if song is not None:
+                song = list(song)
+                song.append(avg_rating)
+                song = tuple(song)
+                songs.append(song)
+
+        cursor.execute(
+            "SELECT * FROM uploadsong WHERE uploadsong_id NOT IN (SELECT uploadsong_id FROM Likes)"
+        )
+        unrated_songs = cursor.fetchall()
+        songs.extend(unrated_songs)
+
+        cursor.execute("SELECT * FROM Albums")
+        albums_data = cursor.fetchall()
+
+        cursor.execute("SELECT DISTINCT genre FROM uploadsong")
+        genre_data = cursor.fetchall()
+
+        cursor.execute("SELECT DISTINCT artist FROM uploadsong")
+        artist_date_data = cursor.fetchall()
+
+        username = session["username"]
+        cursor.execute(
+            "SELECT Playlist_ID, name FROM Playlists WHERE username = ?", (username,)
+        )
+        playlists = cursor.fetchall()
+
+        data = {
+            "songs": songs,
+            "albums_data": albums_data,
+            "genre_data": genre_data,
+            "artist_date_data": artist_date_data,
+            "playlists": playlists,
+            "recent_songs": recent_songs_result
+        }
+
+        return jsonify(data)
+
+    except KeyError as key_error:
+        return jsonify({"error": f"KeyError: {str(key_error)}: 'username' key not found in session"})
+    
+    except sqlite3.Error as sqlite_error:
+        return jsonify({"error": f"SQLite error: {str(sqlite_error)}"})
+
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"})
+
+
 @app.route("/loginuser", methods=["POST"])
 def login_user():   
     if request.method == "POST":
@@ -189,7 +309,6 @@ def creator():
         else:
             return jsonify({"error": "Error in selecting genre"}), 500
 
-
 @app.route("/userfetchesalbum/<id>", methods=["GET"])
 def fetch_album(id):
     # select all songs from uploadsong table where album_id = id, and prepare list in manner we have prepared in home route
@@ -283,86 +402,6 @@ def create_playlist():
 
     return render_template("playlistcreate.html")
 
-@app.route("/")
-def fetchedsongdata():
-    try:
-        if "username" not in session:
-            return jsonify({"error":"Kindly login"}), 401
-
-        conn = sqlite3.connect("user_data.db")
-        cursor = conn.cursor()
-
-        cursor.execute(
-            "SELECT uploadsong_id, AVG(rating) FROM Likes GROUP BY uploadsong_id ORDER BY AVG(rating) DESC"
-        )
-        uploadsong_ids = cursor.fetchall()
-        uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
-
-        songs = []
-
-        for uploadsong_id in uploadsong_ids:
-            conn = sqlite3.connect("user_data.db", check_same_thread=False)
-            cursor = conn.cursor()
-
-            cursor.execute(
-                "SELECT * FROM uploadsong WHERE uploadsong_id = ?", (uploadsong_id,)
-            )
-            song = cursor.fetchone()
-            cursor.execute(
-                "SELECT AVG(rating) FROM Likes WHERE uploadsong_id = ?",
-                (uploadsong_id,),
-            )
-            avg_rating = cursor.fetchone()
-            avg_rating = avg_rating[0] if avg_rating is not None else 0
-
-            if song is not None:
-                song = list(song)
-                song.append(avg_rating)
-                song = tuple(song)
-                songs.append(song)
-
-        cursor.execute(
-            "SELECT * FROM uploadsong WHERE uploadsong_id NOT IN (SELECT uploadsong_id FROM Likes)"
-        )
-        unrated_songs = cursor.fetchall()
-        songs.extend(unrated_songs)
-
-        cursor.execute("SELECT * FROM Albums")
-        albums_data = cursor.fetchall()
-
-        cursor.execute("SELECT DISTINCT genre FROM uploadsong")
-        genre_data = cursor.fetchall()
-
-        cursor.execute("SELECT DISTINCT artist FROM uploadsong")
-        artist_date_data = cursor.fetchall()
-
-        username = session["username"]
-        cursor.execute(
-            "SELECT Playlist_ID, name FROM Playlists WHERE username = ?", (username,)
-        )
-        playlists = cursor.fetchall()
-
-        data = {
-            "songs": songs,
-            "albums_data": albums_data,
-            "genre_data": genre_data,
-            "artist_date_data": artist_date_data,
-            "playlists": playlists
-        }
-
-        return jsonify(data)
-
-    except KeyError as key_error:
-        return jsonify({"error": f"KeyError: {str(key_error)}: 'username' key not found in session"})
-    
-    except sqlite3.Error as sqlite_error:
-        return jsonify({"error": f"SQLite error: {str(sqlite_error)}"})
-
-    except Exception as e:
-        return jsonify({"error": f"Error: {str(e)}"})
-
-
-
 @app.route("/uploadsong", methods=["POST"])
 def upload():
     if request.method == "POST":
@@ -432,7 +471,6 @@ def upload():
         # conn.close()
         return jsonify({"message": "Song uploaded successfully"})
 
-
 @app.route("/genre/<id>", methods=["GET"])
 def genre(id):
     # user explores genre with name = id, in this route user will be shown all songs in that genre
@@ -440,6 +478,7 @@ def genre(id):
     songs = cursor.fetchall()
     songs = [song for song in songs]
     return render_template("usergenre.html", songs=songs,GenreName=id)
+
 @app.route("/playlist/<id>", methods=["GET"])
 def playlist(id):
     if request.method == "GET":

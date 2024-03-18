@@ -1,7 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect("user_data.db")
-
+conn = sqlite3.connect("backend/user_data.db")
 cursor = conn.cursor()
 
 # -------- user login register ---------
@@ -97,17 +96,24 @@ cursor = conn.cursor()
 #   FOREIGN KEY (uploadsong_id) REFERENCES uploadsong(uploadsong_id)
 # )"""
 
+
+# --------- Recent songs ---------
+
+# sql_query = """CREATE TABLE Recent_Songs (
+#   uploadsong_id INT,
+#   Click_Date_Time DATETIME,
+#   PRIMARY KEY (uploadsong_id),
+#   FOREIGN KEY (uploadsong_id) REFERENCES uploadsong(uploadsong_id)
+# )"""
+
 # cursor.execute("DROP TABLE IF EXISTS Playlist_Tracks")
-
-
 # to clear all the data
 # cursor.execute("DELETE FROM Likes")
-
 
 # cursor.execute(sql_query)
 # try:
 #     cursor.execute(
-#         "INSERT INTO Playlists (Playlist_ID, username, Name) VALUES ('1', 'test123', 'name')"
+#         "INSERT INTO Recent_Songs (uploadsong_id, Click_Date_Time) VALUES ('5', '2024-03-19 01:20:31')"
 #     )
 #     conn.commit()
 # except Exception as e:
