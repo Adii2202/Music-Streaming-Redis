@@ -1,85 +1,35 @@
 <template>
   <div class="vercel-background">
     <UsernavbarView />
-
-    <div class="pt-12 pl-12 pb-12 pr-12 scroll-container">
-      <!-- Recent Songs -->
-      <div class="section">
-        <div class="text section-title">Recent Songs</div>
-        <div class="card-container">
-          <CardView
-            v-for="(card, index) in cardData"
-            :key="index"
-            :data="card"
-          />
-        </div>
-      </div>
-      <!-- Most Rated Songs -->
-      <div class="section">
-        <div class="text section-title">Most Rated Songs</div>
-        <div class="card-container">
-          <CardView
-            v-for="(card, index) in mostRatedSongs"
-            :key="index"
-            :data="card"
-          />
+    <div class="main-bg">
+      <div class="pt-12 pl-12 pb-12 pr-12 scroll-container">
+        <!-- Recent Songs -->
+        <div class="section">
+          <div class="text section-title">Recent Songs</div>
+          <div class="card-container">
+            <!-- <PlaylistcardView /> -->
+            <CardView />
+          </div>
         </div>
       </div>
 
-      <!-- Albums -->
-      <div class="section">
-        <div class="text section-title">Albums</div>
-        <div class="card-container">
-          <PlaylistcardView
-            v-for="(card, index) in albums"
-            :key="index"
-            :data="card"
-          />
-        </div>
-      </div>
-
-      <!-- Your Playlists -->
-      <div class="section">
-        <div class="text section-title">Your Playlists</div>
-        <div class="card-container">
-          <PlaylistcardView
-            v-for="(card, index) in playlists"
-            :key="index"
-            :data="card"
-          />
-        </div>
-      </div>
-
-      <!-- Explore Genre -->
-      <div class="mb-16 section">
-        <div class="text section-title">Explore Genre</div>
-        <div class="card-container">
-          <PlaylistcardView />
-          <!-- <PlaylistcardView
-            v-for="(card, index) in genre_data"
-            :key="index"
-            :data="card"
-          /> -->
-        </div>
-      </div>
+      <CurrentplaybarView />
     </div>
-
-    <CurrentplaybarView />
   </div>
 </template>
 
 <script>
 import CardView from "./CardView.vue";
-import PlaylistcardView from "./PlaylistcardView.vue";
+// import PlaylistcardView from "./PlaylistcardView.vue";
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
 export default {
-  name: "HomeView",
+  name: "PlaylistsongsView",
   components: {
     CardView,
     UsernavbarView,
-    PlaylistcardView,
+    // PlaylistcardView,
     CurrentplaybarView,
   },
   data() {
@@ -121,10 +71,13 @@ export default {
 </script>
 
 <style scoped>
-scroll-container {
+.scroll-container {
   display: flex;
+  align-items: center; /* Align items vertically in the center */
+  justify-content: center; /* Align items horizontally in the center */
   flex-direction: column; /* Ensure a column layout */
   overflow-x: auto; /* Enable horizontal scrolling if needed */
+  height: 100vh; /* Ensure the container takes up the full viewport height */
 }
 
 .section {
@@ -142,13 +95,21 @@ scroll-container {
   display: none; /* WebKit-based browsers: Hide scrollbar */
 }
 
+.main-bg {
+  display: flex;
+  padding: 10;
+  height: 70vh;
+  align-items: center;
+  justify-content: center;
+}
+
 .vercel-background {
   background: linear-gradient(to bottom right, #121415, #303034);
-  min-height: 100vh;
+  /* min-height: 80vh; */
   padding-bottom: 100px;
-  /* display: flex;
-  align-items: center;
-  justify-content: center; */
+  /* display: flex; */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
 }
 
 .card-container {

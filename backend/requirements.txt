@@ -1,4 +1,5 @@
 flask
-sqlite3
+redis
+sqlite-database
 flask_cors
 flask_session
