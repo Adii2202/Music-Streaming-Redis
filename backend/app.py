@@ -75,8 +75,7 @@ def fetchedsongdata():
     try:
         if "username" not in session:
             return jsonify({"error":"Kindly login"}), 401
-        data = request.json
-        uploadsongid = data.get("uploadsong_id")
+        uploadsongid = request.args.get("uploadsong_id")
         recent_songs_result = fetch_recent_songs(uploadsongid)
 
         conn = sqlite3.connect("user_data.db")
