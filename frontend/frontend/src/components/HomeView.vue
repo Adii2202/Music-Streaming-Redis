@@ -39,7 +39,7 @@
         <div class="text section-title">Your Playlists</div>
         <div class="card-container">
           <CardView
-            v-for="(card, index) in cardData"
+            v-for="(card, index) in playlists"
             :key="index"
             :data="card"
           />
@@ -51,7 +51,7 @@
         <div class="text section-title">Explore Genre</div>
         <div class="card-container">
           <CardView
-            v-for="(card, index) in cardData"
+            v-for="(card, index) in genre_data"
             :key="index"
             :data="card"
           />
@@ -79,10 +79,13 @@ export default {
     return {
       mostRatedSongs: [],
       albums: [],
+      playlists: [],
+      genre_data: [],
     };
   },
   created() {
     this.fetchMostRatedSongs();
+    this.fetchplaylist();
   },
   methods: {
     async fetchMostRatedSongs() {
@@ -93,6 +96,8 @@ export default {
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
           this.albums = response.data.albums_data;
+          this.playlists = response.data.playlists;
+          this.genre_data = response.data.genre_data;
         } else {
           console.error(
             "Failed to fetch most rated songs:",
@@ -103,6 +108,7 @@ export default {
         console.error("Error fetching most rated songs:", error);
       }
     },
+    async fetchplaylist() {},
   },
 };
 </script>

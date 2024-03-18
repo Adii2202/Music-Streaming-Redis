@@ -440,7 +440,6 @@ def genre(id):
     songs = cursor.fetchall()
     songs = [song for song in songs]
     return render_template("usergenre.html", songs=songs,GenreName=id)
-
 @app.route("/playlist/<id>", methods=["GET"])
 def playlist(id):
     if request.method == "GET":
@@ -451,16 +450,17 @@ def playlist(id):
                 (id,),
             )
             songs = cursor.fetchall()
-            print(songs)
-            songs = [song for song in songs]
+            songs = [{"uploadsong_id": song[0], "title": song[1]} for song in songs]
+            
             cursor.execute(
                 "SELECT name FROM Playlists WHERE Playlist_ID = ?", (id,)
             )
-            PlaylistName = cursor.fetchone()[0]
-            return render_template("playlists.html", songs=songs, PlaylistName=PlaylistName)
+            playlist_name = cursor.fetchone()[0]
+            
+            return jsonify({"songs": songs, "PlaylistName": playlist_name})
         else:
-            return render_template("loginuser.html", message="Please login first")
-
+            return jsonify({"message": "Please login first"}), 401
+        
 @app.route("/creatorsdash", methods=["GET"])
 def creatorsdash():
     cursor.execute(
@@ -885,39 +885,73 @@ def tracklist():
         return jsonify(genre_songs)
 
 
+# @app.route("/flagunflag/<id>", methods=["GET", "POST"])
+# def flagunflag(id):
+#     if request.method == "GET":
+#         cursor.execute(
+#             "SELECT isFlagged FROM uploadsong WHERE uploadsong_id = ?", (id,)
+#         )
+#         isFlagged = cursor.fetchone()
+#         if isFlagged is not None:
+#             isFlagged = isFlagged[0]
+#             if isFlagged == 0:
+#                 cursor.execute(
+#                     "UPDATE uploadsong SET isFlagged = 1 WHERE uploadsong_id = ?", (id,)
+#                 )
+#                 conn.commit()
+#                 return redirect("/tracklist")
+#             else:
+#                 cursor.execute(
+#                     "UPDATE uploadsong SET isFlagged = 0 WHERE uploadsong_id = ?", (id,)
+#                 )
+#                 conn.commit()
+#                 return redirect("/tracklist")
+#         else:
+#             return redirect("/tracklist")
+#     return redirect("/tracklist")
+
+
+# @app.route("/delete/<id>", methods=["GET", "POST"])
+# def delete(id):
+#     if request.method == "GET":
+#         cursor.execute("DELETE FROM uploadsong WHERE uploadsong_id = ?", (id,))
+#         conn.commit()
+#         return redirect("/tracklist")
+#     return redirect("/tracklist")
+
 @app.route("/flagunflag/<id>", methods=["GET", "POST"])
 def flagunflag(id):
     if request.method == "GET":
         cursor.execute(
             "SELECT isFlagged FROM uploadsong WHERE uploadsong_id = ?", (id,)
         )
-        isFlagged = cursor.fetchone()
-        if isFlagged is not None:
-            isFlagged = isFlagged[0]
-            if isFlagged == 0:
+        is_flagged = cursor.fetchone()
+        if is_flagged is not None:
+            is_flagged = is_flagged[0]
+            if is_flagged == 0:
                 cursor.execute(
                     "UPDATE uploadsong SET isFlagged = 1 WHERE uploadsong_id = ?", (id,)
                 )
                 conn.commit()
-                return redirect("/tracklist")
+                return jsonify({"message": "Song flagged"})
             else:
                 cursor.execute(
                     "UPDATE uploadsong SET isFlagged = 0 WHERE uploadsong_id = ?", (id,)
                 )
                 conn.commit()
-                return redirect("/tracklist")
+                return jsonify({"message": "Flag removed"})
         else:
-            return redirect("/tracklist")
-    return redirect("/tracklist")
+            return jsonify({"message": "Song not found"}), 404
+    return jsonify({"message": "Invalid request method"}), 405
 
-
-@app.route("/delete/<id>", methods=["GET", "POST"])
+@app.route("/delete/<id>", methods=["DELETE"])
 def delete(id):
-    if request.method == "GET":
+    if request.method == "DELETE":
         cursor.execute("DELETE FROM uploadsong WHERE uploadsong_id = ?", (id,))
         conn.commit()
-        return redirect("/tracklist")
-    return redirect("/tracklist")
+        return jsonify({"message": "Song deleted"})
+    return jsonify({"message": "Invalid request method"}), 405
+
 
 
 if __name__ == "__main__":
