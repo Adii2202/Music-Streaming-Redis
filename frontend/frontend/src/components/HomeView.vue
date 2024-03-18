@@ -30,7 +30,11 @@
       <div class="section">
         <div class="text section-title">Albums</div>
         <div class="card-container">
-          <CardView v-for="(card, index) in albums" :key="index" :data="card" />
+          <PlaylistcardView
+            v-for="(card, index) in albums"
+            :key="index"
+            :data="card"
+          />
         </div>
       </div>
 
@@ -38,7 +42,7 @@
       <div class="section">
         <div class="text section-title">Your Playlists</div>
         <div class="card-container">
-          <CardView
+          <PlaylistcardView
             v-for="(card, index) in playlists"
             :key="index"
             :data="card"
@@ -50,11 +54,12 @@
       <div class="mb-16 section">
         <div class="text section-title">Explore Genre</div>
         <div class="card-container">
-          <CardView
+          <PlaylistcardView />
+          <!-- <PlaylistcardView
             v-for="(card, index) in genre_data"
             :key="index"
             :data="card"
-          />
+          /> -->
         </div>
       </div>
     </div>
@@ -65,6 +70,7 @@
 
 <script>
 import CardView from "./CardView.vue";
+import PlaylistcardView from "./PlaylistcardView.vue";
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
@@ -73,6 +79,7 @@ export default {
   components: {
     CardView,
     UsernavbarView,
+    PlaylistcardView,
     CurrentplaybarView,
   },
   data() {
