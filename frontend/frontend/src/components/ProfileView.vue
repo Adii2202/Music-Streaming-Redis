@@ -3,8 +3,8 @@
     <UsernavbarView />
     <div class="center-container">
       <div class="pt-8 profile-card">
-        <div class="role">Role</div>
-        <div class="name">Name</div>
+        <div class="role">{{ role }}</div>
+        <div class="name">{{ name }}</div>
         <router-link to="/home" class="home-button"
           ><span class="text">Home</span></router-link
         >
@@ -15,10 +15,36 @@
 
 <script>
 import UsernavbarView from "./UsernavbarView.vue";
+import axios from "axios"; // Import axios
+
 export default {
   name: "ProfileView",
   components: {
     UsernavbarView,
+  },
+  data() {
+    return {
+      role: "", // Initialize role with an empty string
+      name: "", // Initialize name with an empty string
+    };
+  },
+  methods: {
+    async fetch() {
+      try {
+        const response = await axios.get("http://localhost:5000/useraccount");
+        // Extract username and email from the response data
+        const { username, email } = response.data;
+        // Update data properties with fetched data
+        this.role = username;
+        this.name = email;
+      } catch (error) {
+        console.error("Error fetching user account:", error);
+      }
+    },
+  },
+  created() {
+    // Call the fetch method when the component is created
+    this.fetch();
   },
 };
 </script>

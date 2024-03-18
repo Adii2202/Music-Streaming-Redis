@@ -20,7 +20,7 @@
           placeholder="Artist"
           class="custom-input"
         />
-        <button class="submit" @click="submitForm">Submit</button>
+        <button class="submit" @click="fetchData">Fetch Data and Submit</button>
       </div>
     </div>
   </div>
@@ -29,6 +29,7 @@
 <script>
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
+
 export default {
   name: "CreatorsView",
   components: {
@@ -39,11 +40,27 @@ export default {
       showInputFields: false,
       genre: "",
       artist: "",
+      fetchedData: null, // to store fetched data
     };
   },
   methods: {
+    async fetchData() {
+      try {
+        const response = await axios.get("http://localhost:5000/creator"); // Replace with your endpoint
+        console.log(response.data);
+        this.fetchedData = response.data; // Store fetched data for later use
+
+        // Call the submitForm method after fetching data
+        this.submitForm();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
     async submitForm() {
       try {
+        // Access fetched data if needed
+        console.log("Fetched data:", this.fetchedData);
+
         const response = await axios.post("http://localhost:5000/creator", {
           genre: this.genre,
           artist: this.artist,

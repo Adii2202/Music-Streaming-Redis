@@ -19,7 +19,7 @@
         <div class="text section-title">Most Rated Songs</div>
         <div class="card-container">
           <CardView
-            v-for="(card, index) in cardData"
+            v-for="(card, index) in mostRatedSongs"
             :key="index"
             :data="card"
           />
@@ -69,7 +69,7 @@
 
 <script>
 import CardView from "./CardView.vue";
-// import axios from "axios";
+import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
 export default {
@@ -81,35 +81,31 @@ export default {
   },
   data() {
     return {
-      cardData: [
-        { songName: "Song 1", artistName: "Artist 1", rating: "5" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-        { songName: "Song 2", artistName: "Artist 2", rating: "4" },
-      ],
+      mostRatedSongs: [],
     };
   },
-  // methods: {
-  //   async logout() {
-  //     try {
-  //       const response = await axios.post("http://localhost:5000/logout");
-
-  //       if (response.status === 200) {
-  //         // Redirect to login page after successful logout
-  //         this.$router.push("/login");
-  //       } else {
-  //         console.error("Logout failed:", response.data.error);
-  //       }
-  //     } catch (error) {
-  //       console.error("Logout error:", error);
-  //     }
-  //   },
-  // },
+  created() {
+    this.fetchMostRatedSongs();
+  },
+  methods: {
+    async fetchMostRatedSongs() {
+      try {
+        console.log("121");
+        const response = await axios.get("http://localhost:5000/");
+        console.log(response);
+        if (response.status === 200) {
+          this.mostRatedSongs = response.data.songs;
+        } else {
+          console.error(
+            "Failed to fetch most rated songs:",
+            response.data.error
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching most rated songs:", error);
+      }
+    },
+  },
 };
 </script>
 
