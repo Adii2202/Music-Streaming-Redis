@@ -31,12 +31,8 @@ app.static_folder = "static"
 
 conn = sqlite3.connect("user_data.db", check_same_thread=False)
 cursor = conn.cursor()
-
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
-
 app.config["UPLOAD_FOLDER"] = "uploads"
-
+session = {}
 @app.route("/loginuser", methods=["POST"])
 def login_user():   
     if request.method == "POST":

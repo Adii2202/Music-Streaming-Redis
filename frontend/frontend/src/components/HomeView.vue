@@ -30,11 +30,7 @@
       <div class="section">
         <div class="text section-title">Albums</div>
         <div class="card-container">
-          <CardView
-            v-for="(card, index) in cardData"
-            :key="index"
-            :data="card"
-          />
+          <CardView v-for="(card, index) in albums" :key="index" :data="card" />
         </div>
       </div>
 
@@ -82,6 +78,7 @@ export default {
   data() {
     return {
       mostRatedSongs: [],
+      albums: [],
     };
   },
   created() {
@@ -95,6 +92,7 @@ export default {
         console.log(response);
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
+          this.albums = response.data.albums_data;
         } else {
           console.error(
             "Failed to fetch most rated songs:",
