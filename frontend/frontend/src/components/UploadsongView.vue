@@ -88,6 +88,8 @@ export default {
       formData.append("lyrics", this.lyrics);
 
       try {
+        console.log(this.title);
+        console.log(this.artist);
         const response = await axios.post(
           "http://localhost:5000/uploadsong",
           formData,
@@ -106,7 +108,7 @@ export default {
       }
     },
     onFileChange(event) {
-      this.file = event.target.files[0];
+      this.uploaded_file = event.target.files[0];
     },
   },
 };

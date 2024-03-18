@@ -48,9 +48,8 @@ export default {
       try {
         const response = await axios.get("http://localhost:5000/creator"); // Replace with your endpoint
         console.log(response.data);
-        this.fetchedData = response.data; // Store fetched data for later use
-
-        // Call the submitForm method after fetching data
+        this.fetchedData = response.data;
+        console.log(this.fetchedData);
         this.submitForm();
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,7 +66,6 @@ export default {
         });
         console.log(response.data);
         if (response.status === 200) {
-          // Redirect to login page after successful logout
           this.$router.push("/upload");
         } else {
           console.error("Logout failed:", response.data.error);
