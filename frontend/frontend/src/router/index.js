@@ -13,6 +13,7 @@ import AdmintracksView from "../components/AdmintracksView.vue";
 import ProfileView from "../components/ProfileView.vue";
 import UserdashboardView from "../components/UserdashboardView.vue";
 import SongslyricsView from "../components/SongslyricsView.vue";
+import PlaylistsongsView from "../components/PlaylistsongsView.vue";
 
 const routes = [
   {
@@ -80,6 +81,11 @@ const routes = [
     path: "/profile",
     name: "ProfileView",
     component: ProfileView,
+  },
+  {
+    path: "/playlistsongs",
+    name: "PlaylistsongsView",
+    component: PlaylistsongsView,
   },
 ];
 

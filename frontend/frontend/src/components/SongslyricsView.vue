@@ -1,61 +1,65 @@
 <template>
   <div class="vercel-background">
-    <div class="center-container">
-      <div class="song-card">
-        <div class="song-info">
-          <h2 class="text">{{ songName }}</h2>
-          <button class="play-btn" @click="togglePlayPause">
-            {{ isPlaying ? "Pause" : "Play" }}
-          </button>
-          <p class="text">{{ releaseDate }}</p>
-        </div>
+    <UsernavbarView />
+    <!-- Uncommented navbar component -->
+    <div class="main-bg">
+      <div class="center-container">
+        <div class="song-card">
+          <div class="song-info">
+            <h2 class="text">{{ songName }}</h2>
+            <button class="play-btn" @click="togglePlayPause">
+              {{ isPlaying ? "Pause" : "Play" }}
+            </button>
+            <p class="text">{{ releaseDate }}</p>
+          </div>
 
-        <div class="custom-slider">
-          <!-- <label for="progress">Progress:</label>
+          <div class="custom-slider">
+            <!-- <label for="progress">Progress:</label>
           <input
             type="range"
             id="progress"
             v-model="progress"
             @input="updateProgress"
           /> -->
-          <!-- <span>{{ formattedTime(progress) }}</span> -->
-        </div>
+            <!-- <span>{{ formattedTime(progress) }}</span> -->
+          </div>
 
-        <div class="player-controls">
-          <!-- Play/Pause button and progress bar -->
+          <div class="player-controls">
+            <!-- Play/Pause button and progress bar -->
+
+            <div class="custom-slider">
+              <label class="text" for="musicTime">Music Time:</label>
+              <input
+                type="range"
+                id="musicTime"
+                v-model="musicTime"
+                @input="updateMusicTime"
+              />
+              <span class="text">{{ formattedTime(musicTime) }}</span>
+            </div>
+          </div>
 
           <div class="custom-slider">
-            <label class="text" for="musicTime">Music Time:</label>
+            <label class="text" for="volume">Volume:</label>
             <input
               type="range"
-              id="musicTime"
-              v-model="musicTime"
-              @input="updateMusicTime"
+              id="volume"
+              v-model="volume"
+              @input="updateVolume"
             />
-            <span class="text">{{ formattedTime(musicTime) }}</span>
+            <span class="text">{{ volume }}</span>
+            <div class="btn-2">
+              <button class="btn" @click="decreaseVolume">-</button>
+              <button class="btn" @click="increaseVolume">+</button>
+            </div>
           </div>
-        </div>
 
-        <div class="custom-slider">
-          <label class="text" for="volume">Volume:</label>
-          <input
-            type="range"
-            id="volume"
-            v-model="volume"
-            @input="updateVolume"
-          />
-          <span class="text">{{ volume }}</span>
-          <div class="btn-2">
-            <button class="btn" @click="decreaseVolume">-</button>
-            <button class="btn" @click="increaseVolume">+</button>
+          <div class="lyrics">
+            <!-- Lyrics display area -->
+            <p class="text" v-for="(line, index) in lyrics" :key="index">
+              {{ line }}
+            </p>
           </div>
-        </div>
-
-        <div class="lyrics">
-          <!-- Lyrics display area -->
-          <p class="text" v-for="(line, index) in lyrics" :key="index">
-            {{ line }}
-          </p>
         </div>
       </div>
     </div>
@@ -63,8 +67,13 @@
 </template>
 
 <script>
+import UsernavbarView from "./UsernavbarView.vue"; // Import the navbar component
+
 export default {
   name: "SongslyricsView",
+  components: {
+    UsernavbarView, // Add the navbar component to the list of components
+  },
   data() {
     return {
       songName: "Song Title",
@@ -139,10 +148,10 @@ export default {
   margin-right: 10px;
 }
 
-.vercel-background {
-  background-color: #000;
-  height: 100vh;
+.main-bg {
   display: flex;
+  padding: 10;
+  height: 80vh;
   align-items: center;
   justify-content: center;
 }
