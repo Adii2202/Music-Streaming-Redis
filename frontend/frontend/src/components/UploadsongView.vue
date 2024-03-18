@@ -99,7 +99,7 @@ export default {
             },
           }
         );
-        console.log(response);
+        console.log(response.data);
         alert(response.data.message);
         this.$router.push("/userdash");
       } catch (error) {

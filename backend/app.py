@@ -18,24 +18,24 @@ import os
 import redis
 from flask_session import Session
 
-
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:8080"])
 app.secret_key = "__privatekey__"
 app.static_folder = "static"
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+# app.config['SESSION_TYPE'] = 'redis'
+# app.config['SESSION_PERMANENT'] = False
+# app.config['SESSION_USE_SIGNER'] = True
+# app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
 
-redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+# redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
 conn = sqlite3.connect("user_data.db", check_same_thread=False)
 cursor = conn.cursor()
 
-app.config["UPLOAD_FOLDER"] = "uploads"
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
-server_session = Session(app)
+app.config["UPLOAD_FOLDER"] = "uploads"
 
 @app.route("/loginuser", methods=["POST"])
 def login_user():   
@@ -46,7 +46,7 @@ def login_user():
     
         # Check credentials against database (use parameterized queries to prevent SQL injection)
         query = f"SELECT username, password FROM user WHERE username = '{username}' AND password = '{password}'"
-        conn = sqlite3.connect("user_data.db", check_same_thread=False)
+        conn = sqlite3.connect("user_data.db")
         cursor = conn.cursor()
         cursor.execute(query)
 
@@ -67,10 +67,11 @@ def login_user():
                 email = cursor.fetchone()
                 conn.close()
 
-                if email:
-                    session["email"] = email[0]
+                if email is not None:
+                    email = email[0]
+                    session["email"] = email
             print(session)
-            return jsonify({"message": "Login successful"}), 200
+            return jsonify({"message": "Login successful", "session": dict(session)}), 200
 
     return jsonify({"error": "Method not allowed"}), 405
 
@@ -108,7 +109,7 @@ def register_user():
 @app.route("/logout", methods=["POST"])
 def logout_user():
     print(session)
-    redis_client.flushall()
+    # redis_client.flushall()
 
     session.clear()
     return jsonify({"message": "Logout successful"}), 200
@@ -138,13 +139,59 @@ def login_admin():
             return jsonify({"message":"Login Admin Succesfull"}), 200
     return jsonify({"error": "Method not allowed"}), 405
 
-
 @app.route("/logoutadmin", methods=["GET", "POST"])
 def logout_admin():
-    redis_client.flushall()
+    # redis_client.flushall()
 
     session.clear()
     return jsonify({"message": "Logout successful"}), 200
+
+@app.route("/creator", methods=["GET", "POST"])
+def creator():
+    if request.method == "GET":
+        print(session)
+        if "email" in session:
+            email = session["email"]
+            conn = sqlite3.connect("user_data.db")
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT creator_id FROM creator WHERE email = '{email}'")
+            artist_id = cursor.fetchone()
+            if artist_id is not None:
+                artist_id = artist_id[0]
+                session["artist_id"] = artist_id
+                return jsonify({"message": "Success", "artist_id": artist_id})
+            else:
+                return jsonify({"error": "Please select a genre"}), 400
+        else:
+            return jsonify({"error": "Please login first"}), 401
+    else:
+        data = request.json
+        genre = data.get("genre")
+        conn = sqlite3.connect("user_data.db")
+        cursor = conn.cursor()
+            
+        print(session)
+        # if email not in session:
+        #     return jsonify({"message":"Login please"})
+        email = session["email"]
+        artist = data.get("artist")
+        if artist == "":
+            return jsonify({"error": "Please enter artist name"}), 400
+        if genre == "":
+            return jsonify({"error": "Please select a genre"}), 400
+        cursor.execute(
+            "INSERT INTO creator (artist, email, genre) VALUES (?, ?, ?)",
+            (artist, email, genre),
+        )
+        conn.commit()
+        cursor.execute("SELECT creator_id FROM creator WHERE email = ?", (email,))
+        artist_id = cursor.fetchone()
+        if artist_id is not None:
+            artist_id = artist_id[0]
+            session["artist_id"] = artist_id
+            return jsonify({"message": "Success", "artist_id": artist_id}), 200
+        else:
+            return jsonify({"error": "Error in selecting genre"}), 500
 
 
 @app.route("/userfetchesalbum/<id>", methods=["GET"])
@@ -157,8 +204,6 @@ def fetch_album(id):
     album_name = cursor.fetchone()[0]
     
     return render_template("userfetchesalbum.html", songs=songs, album_name=album_name)
-
-
 
 @app.route("/createplaylist", methods=["GET", "POST"])
 def create_playlist():
@@ -243,18 +288,12 @@ def create_playlist():
     return render_template("playlistcreate.html")
 
 @app.route("/")
-# def fetch():
-#     if "username" in session : 
-#         print("hehehehehe")
-#         return jsonify({"message":"helloo"}), 200
-#     return jsonify({"error":"Kindly login"}), 401
 def fetchedsongdata():
     try:
         if "username" not in session:
-            # Redirect to the login page if the username is not in the session or is None
             return jsonify({"error":"Kindly login"}), 401
 
-        conn = sqlite3.connect("user_data.db", check_same_thread=False)
+        conn = sqlite3.connect("user_data.db")
         cursor = conn.cursor()
 
         cursor.execute(
@@ -263,10 +302,12 @@ def fetchedsongdata():
         uploadsong_ids = cursor.fetchall()
         uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
 
-        # Initialize songs list
         songs = []
 
         for uploadsong_id in uploadsong_ids:
+            conn = sqlite3.connect("user_data.db", check_same_thread=False)
+            cursor = conn.cursor()
+
             cursor.execute(
                 "SELECT * FROM uploadsong WHERE uploadsong_id = ?", (uploadsong_id,)
             )
@@ -284,7 +325,6 @@ def fetchedsongdata():
                 song = tuple(song)
                 songs.append(song)
 
-        # Fetch unrated songs
         cursor.execute(
             "SELECT * FROM uploadsong WHERE uploadsong_id NOT IN (SELECT uploadsong_id FROM Likes)"
         )
@@ -306,7 +346,6 @@ def fetchedsongdata():
         )
         playlists = cursor.fetchall()
 
-        # Format the data into a dictionary
         data = {
             "songs": songs,
             "albums_data": albums_data,
@@ -326,73 +365,76 @@ def fetchedsongdata():
     except Exception as e:
         return jsonify({"error": f"Error: {str(e)}"})
 
-    finally:
-        conn.close()
+
 
 @app.route("/uploadsong", methods=["POST"])
 def upload():
-    title = request.form["title"]
-    artist = request.form["artist"]
-    genre = request.form["genre"]
-    duration = request.form["duration"]
-    album_name = request.form["album_name"]
-    date = request.form["date"]
-    uploaded_file = request.files["file"]
-    filename = uploaded_file.filename
-    lyrics = request.form["lyrics"]
+    if request.method == "POST":
 
-    cursor.execute("SELECT creator_id FROM creator WHERE artist = ?", (artist,))
-    creator_id = cursor.fetchone()
+        title = request.form["title"]
+        artist = request.form["artist"]
+        genre = request.form["genre"]
+        duration = request.form["duration"]
+        Album_name = request.form["Album_name"]
+        date = request.form["date"]
+        if "uploaded_file" not in request.files:
+            return jsonify({"error": "No file part"}), 400
+        uploaded_file = request.files["uploaded_file"]
+        filename = uploaded_file.filename
+        lyrics = request.form["lyrics"]
+        cursor.execute("SELECT creator_id FROM creator WHERE artist = ?", (artist,))
+        creator_id = cursor.fetchone()
 
-    if creator_id is not None:
-        creator_id = creator_id[0]
-    else:
-        return jsonify({"error": "Please register as a creator first"}), 400
+        if creator_id is not None:
+            creator_id = creator_id[0]
+        else:
+            return jsonify({"error": "Please register as a creator first"})
 
-    cursor.execute(
-        "SELECT Album_ID FROM Albums WHERE Album_name = ? AND Artist_ID = ? ",
-        (
-            album_name,
-            creator_id,
-        ),
-    )
-    album_id = cursor.fetchone()
-    if album_id is not None:
-        album_id = album_id[0]
-    else:
         cursor.execute(
-            "INSERT INTO Albums (Artist_ID, Album_name, Release_Date) VALUES (?, ?, ?)",
+            "SELECT Album_ID FROM Albums WHERE Album_name = ? AND Artist_ID = ? ",
             (
+                Album_name,
                 creator_id,
-                album_name,
+            ),
+        )
+        album_id = cursor.fetchone()
+        if album_id is not None:
+            album_id = album_id[0]
+        else:
+            # creating new album if album not found, giving attributes Artist_ID, Album_name and Release_Date ( same as songs date)
+            cursor.execute(
+                "INSERT INTO Albums (Artist_ID, Album_name, Release_Date) VALUES (?, ?, ?)",
+                (
+                    creator_id,
+                    Album_name,
+                    date,
+                ),
+            )
+            return jsonify({
+            "message": "Album not found, created one new by the name '" + Album_name + "' for you, now upload song with this album name if you want to add more songs to this album"
+        })
+
+        filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + filename
+        print(filename)
+        uploaded_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        cursor.execute(
+            "INSERT INTO uploadsong (title, artist, genre, duration, date, filename, lyrics, isFlagged, creator_id, album_id) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
+            (
+                title,
+                artist,
+                genre,
+                duration,
                 date,
+                filename,
+                lyrics,
+                creator_id,
+                album_id,
             ),
         )
         conn.commit()
-        return jsonify({"message": f"Album '{album_name}' created successfully"}), 200
-
-    if filename != "":
-        filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + filename
-        uploaded_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    else:
-        return jsonify({"message": "Please upload a file"}), 400
-
-    cursor.execute(
-        "INSERT INTO uploadsong (title, artist, genre, duration, date, filename, lyrics, isFlagged, creator_id, album_id) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)",
-        (
-            title,
-            artist,
-            genre,
-            duration,
-            date,
-            filename,
-            lyrics,
-            creator_id,
-            album_id,
-        ),
-    )
-    conn.commit()
-    return jsonify({"message": "Song uploaded successfully"}), 200
+        # conn.close()
+        return jsonify({"message": "Song uploaded successfully"})
 
 
 @app.route("/genre/<id>", methods=["GET"])
@@ -508,10 +550,6 @@ def useraccount():
 
     return render_template("useraccount.html", user_data=user_data)
 
-
-
-
-
 @app.route("/search", methods=["POST"])
 def search():
     if request.method == "POST":
@@ -574,7 +612,7 @@ def push_search_album_results(albums):
             "release_date": release_date,
         }
         print(album_info)
-        redis_client.hmset(album_key, album_info)
+        # redis_client.hmset(album_key, album_info)
 
 
 
@@ -592,100 +630,100 @@ def push_search_song_results(songs):
             "date_added": song[5],
             "filename": song[6],
         }
-        redis_client.hmset(song_key, song_data)
+        # redis_client.hmset(song_key, song_data)
 
   
     
     
 
 @app.route("/adminsearch", methods=["POST"])
-def adminsearch():
-    search = request.form["adminsearch"]
-    # we want to exclude those songs from this adminflag.html template which are not similar to my search query, so code will be same as tracklist route
+# def adminsearch():
+#     search = request.form["adminsearch"]
+#     # we want to exclude those songs from this adminflag.html template which are not similar to my search query, so code will be same as tracklist route
 
-    cursor.execute(
-        "SELECT DISTINCT genre FROM uploadsong WHERE title LIKE ? OR artist LIKE ?",
-        ("%" + search + "%", "%" + search + "%"),
-    )
-    genres = cursor.fetchall()
-    genres = [genre[0] for genre in genres]
+#     cursor.execute(
+#         "SELECT DISTINCT genre FROM uploadsong WHERE title LIKE ? OR artist LIKE ?",
+#         ("%" + search + "%", "%" + search + "%"),
+#     )
+#     genres = cursor.fetchall()
+#     genres = [genre[0] for genre in genres]
 
-    genre_songs = {}
-    for genre in genres:
-        cursor.execute(
-            "SELECT * FROM uploadsong WHERE genre = ? AND title LIKE ? OR artist LIKE ?",
-            (genre, "%" + search + "%", "%" + search + "%"),
-        )
-        songs = cursor.fetchall()
-        songs = [song for song in songs]
-        genre_songs[genre] = songs
+#     genre_songs = {}
+#     for genre in genres:
+#         cursor.execute(
+#             "SELECT * FROM uploadsong WHERE genre = ? AND title LIKE ? OR artist LIKE ?",
+#             (genre, "%" + search + "%", "%" + search + "%"),
+#         )
+#         songs = cursor.fetchall()
+#         songs = [song for song in songs]
+#         genre_songs[genre] = songs
 
-    return render_template("adminflag.html", genresnsongs=genre_songs)
-
-
-@app.route("/play/<id>", methods=["GET", "POST"])
-def play(id):
-    if request.method == "GET":
-        cursor.execute("SELECT * FROM uploadsong WHERE uploadsong_id = ?", (id,))
-        data = cursor.fetchone()
-        if "username" in session:
-            username = session["username"]
-            cursor.execute(
-                "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
-                (username, id),
-            )
-            rating = cursor.fetchone()
-            if rating is not None:
-                rating = rating[0]
-                return render_template("lyricsnplay.html", data=data, rating=rating)
-            else:
-                return render_template("lyricsnplay.html", data=data)
-    else:
-        print("Received rating data from client")
-        rating = request.form["rate"]
-        print(f"Received rating: {rating}")
-        # save this to database if present already by this user then update else insert
-        if "username" in session:
-            username = session["username"]
-            cursor.execute(
-                "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
-                (username, id),
-            )
-            rating_data = cursor.fetchone()
-            if rating_data is None:
-                # i want to insert rating, uploadsong_id, username and like_date_time(which will be current date and time)
-                cursor.execute(
-                    "INSERT INTO Likes (rating, uploadsong_id, username, Like_Date_Time) VALUES (?, ?, ?, datetime('now'))",
-                    (rating, id, username),
-                )
-                conn.commit()
-            else:
-                # i want to update rating and like_date_time(which will be current date and time)
-                cursor.execute(
-                    "UPDATE Likes SET rating = ?, Like_Date_Time = datetime('now') WHERE username = ? AND uploadsong_id = ?",
-                    (rating, username, id),
-                )
-                conn.commit()
-            return redirect("/play/" + id)
-    return render_template("lyricsnplay.html", data=data)
+#     return render_template("adminflag.html", genresnsongs=genre_songs)
 
 
-from functools import wraps
+# @app.route("/play/<id>", methods=["GET", "POST"])
+# def play(id):
+#     if request.method == "GET":
+#         cursor.execute("SELECT * FROM uploadsong WHERE uploadsong_id = ?", (id,))
+#         data = cursor.fetchone()
+#         if "username" in session:
+#             username = session["username"]
+#             cursor.execute(
+#                 "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
+#                 (username, id),
+#             )
+#             rating = cursor.fetchone()
+#             if rating is not None:
+#                 rating = rating[0]
+#                 return render_template("lyricsnplay.html", data=data, rating=rating)
+#             else:
+#                 return render_template("lyricsnplay.html", data=data)
+#     else:
+#         print("Received rating data from client")
+#         rating = request.form["rate"]
+#         print(f"Received rating: {rating}")
+#         # save this to database if present already by this user then update else insert
+#         if "username" in session:
+#             username = session["username"]
+#             cursor.execute(
+#                 "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
+#                 (username, id),
+#             )
+#             rating_data = cursor.fetchone()
+#             if rating_data is None:
+#                 # i want to insert rating, uploadsong_id, username and like_date_time(which will be current date and time)
+#                 cursor.execute(
+#                     "INSERT INTO Likes (rating, uploadsong_id, username, Like_Date_Time) VALUES (?, ?, ?, datetime('now'))",
+#                     (rating, id, username),
+#                 )
+#                 conn.commit()
+#             else:
+#                 # i want to update rating and like_date_time(which will be current date and time)
+#                 cursor.execute(
+#                     "UPDATE Likes SET rating = ?, Like_Date_Time = datetime('now') WHERE username = ? AND uploadsong_id = ?",
+#                     (rating, username, id),
+#                 )
+#                 conn.commit()
+#             return redirect("/play/" + id)
+#     return render_template("lyricsnplay.html", data=data)
 
 
-# Define a decorator to check if the user is an admin
-# def admin_required(route_function):
-#     @wraps(route_function)
-#     def wrapper(*args, **kwargs):
-#         # Check if 'isAdmin' is present in the session and is equal to 1
-#         print(isAdmin)
-#         if session.get("isAdmin") == 1:
-#             return route_function(*args, **kwargs)
-#         else:
-#             # Redirect to loginuser.html if not an admin
-#             return redirect("/loginuser")
+# from functools import wraps
 
-#     return wrapper
+
+# # Define a decorator to check if the user is an admin
+# # def admin_required(route_function):
+# #     @wraps(route_function)
+# #     def wrapper(*args, **kwargs):
+# #         # Check if 'isAdmin' is present in the session and is equal to 1
+# #         print(isAdmin)
+# #         if session.get("isAdmin") == 1:
+# #             return route_function(*args, **kwargs)
+# #         else:
+# #             # Redirect to loginuser.html if not an admin
+# #             return redirect("/loginuser")
+
+# #     return wrapper
 
 
 @app.route("/admin", methods=["GET"])
@@ -830,45 +868,6 @@ def admin():
     # Return the data as a JSON response
     return jsonify(data)
 
-
-@app.route("/creator", methods=["GET", "POST"])
-def creator():
-    if request.method == "GET":
-        if "email" in session:
-            email = session["email"]
-            cursor.execute("SELECT creator_id FROM creator WHERE email = ?", (email,))
-            artist_id = cursor.fetchone()
-            if artist_id is not None:
-                artist_id = artist_id[0]
-                session["artist_id"] = artist_id
-                return render_template("creator.html")
-            else:
-                return render_template("creator.html", message="Please select a genre")
-        else:
-            return render_template("creator.html", error="Please login first")
-    else:
-        genre = request.form["genre"]
-        email = session["email"]
-        artist = request.form["artist"]
-        if artist == "":
-            return render_template("creator.html", error="Please enter artist name")
-        if genre == "":
-            return render_template("creator.html", error="Please select a genre")
-        cursor.execute(
-            "INSERT INTO creator (artist, email, genre) VALUES (?, ?, ?)",
-            (artist, email, genre),
-        )
-        conn.commit()
-        cursor.execute("SELECT creator_id FROM creator WHERE email = ?", (email,))
-        artist_id = cursor.fetchone()
-        if artist_id is not None:
-            artist_id = artist_id[0]
-            session["artist_id"] = artist_id
-            return render_template("creator.html")
-        else:
-            return render_template("creator.html", error="Error in selecting genre")
-
-
 @app.route("/tracklist", methods=["GET", "POST"])
 def tracklist():
     if request.method == "GET":
@@ -923,44 +922,6 @@ def delete(id):
         conn.commit()
         return redirect("/tracklist")
     return redirect("/tracklist")
-
-
-@app.route("/registeradmin", methods=["GET", "POST"])
-def register_admin():
-    if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        password = request.form["password"]
-        username = request.form["username"]
-
-        # Check if the username already exists
-        cursor.execute("SELECT * FROM admin WHERE username=?", (username,))
-        existing_admin = cursor.fetchone()
-
-        if existing_admin:
-            return render_template("loginAdmin.html")
-
-        # If username doesn't exist, insert the new admin
-        cursor.execute(
-            "INSERT INTO admin (name, username, email, password, isAdmin) VALUES (?,?,?,?,1)",
-            (name, username, email, password),
-        )
-        conn.commit()
-
-        # Retrieve isAdmin for the newly registered admin
-        cursor.execute("SELECT isAdmin FROM admin WHERE username=?", (username,))
-        is_admin = cursor.fetchone()
-
-        # Store isAdmin in the session
-        session["isAdmin"] = is_admin[0] if is_admin else 0
-
-        return redirect("/loginuser")
-
-    elif request.method == "GET":
-        return render_template("loginAdmin.html")
-
-    # Redirect to login page after successful registration
-    return redirect("/loginuser")
 
 
 if __name__ == "__main__":
