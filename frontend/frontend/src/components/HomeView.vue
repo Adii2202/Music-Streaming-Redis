@@ -22,6 +22,7 @@
             v-for="(card, index) in mostRatedSongs"
             :key="index"
             :data="card"
+            @click="handlecard(card)"
           />
         </div>
       </div>
@@ -81,23 +82,27 @@ export default {
       albums: [],
       playlists: [],
       genre_data: [],
+      recent_songs: [],
     };
   },
   created() {
     this.fetchMostRatedSongs();
-    this.fetchplaylist();
   },
   methods: {
     async fetchMostRatedSongs() {
       try {
-        console.log("121");
-        const response = await axios.get("http://localhost:5000/");
+        const response = await axios.get("http://localhost:5000/", {});
         console.log(response);
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
+          this.recent_songs = response.data.recent_songs;
+
+          await axios.post("http://localhost:5000/", {
+            uploadsong_id: this.mostRatedSongs[0][0],
+          });
         } else {
           console.error(
             "Failed to fetch most rated songs:",
@@ -108,7 +113,20 @@ export default {
         console.error("Error fetching most rated songs:", error);
       }
     },
-    async fetchplaylist() {},
+    async handlecard(card) {
+      try {
+        const uploadsongId = card[0];
+        console.log(uploadsongId);
+        if (uploadsongId !== null) {
+          const response = await axios.post("http://localhost:5000/", {
+            uploadsong_id: uploadsongId,
+          });
+          console.log(response);
+        }
+      } catch (error) {
+        console.error("Error sending upload song ID:", error);
+      }
+    },
   },
 };
 </script>

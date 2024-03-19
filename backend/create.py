@@ -108,7 +108,7 @@ cursor = conn.cursor()
 
 # cursor.execute("DROP TABLE IF EXISTS Playlist_Tracks")
 # to clear all the data
-# cursor.execute("DELETE FROM Likes")
+# cursor.execute("DELETE FROM Recent_Songs")
 
 # cursor.execute(sql_query)
 # try:

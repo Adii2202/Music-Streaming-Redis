@@ -24,35 +24,32 @@ export default {
     },
     flagTrack() {
       // Handle flag track logic
-      const newFlagStatus = this.song[8] === 1 ? 0 : 1;
-      const songId = this.song[0];
-
-      // Perform GET request to flag/unflag endpoint
-      axios
-        .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
-        .then((response) => {
-          // Update the isFlagged property of the song data
-          this.songId = response.data.message === "Song flagged" ? 1 : 0;
-        })
-        .catch((error) => {
-          console.error("Error flagging/unflagging track:", error);
-        });
-
+      // const newFlagStatus = this.song[8] === 1 ? 0 : 1;
       // const songId = this.song[0];
-
-      // Perform GET request to flag/unflag endpoint
+      // // Perform GET request to flag/unflag endpoint
       // axios
       //   .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
       //   .then((response) => {
-      //     // Emit event to notify parent component of flag status change
-      //     this.$emit("flagged", {
-      //       songId,
-      //       isFlagged: response.data.message === "Song flagged" ? 1 : 0,
-      //     });
+      //     // Update the isFlagged property of the song data
+      //     this.songId = response.data.message === "Song flagged" ? 1 : 0;
       //   })
       //   .catch((error) => {
       //     console.error("Error flagging/unflagging track:", error);
       //   });
+      const songId = this.song[0];
+      // Perform GET request to flag/unflag endpoint
+      axios
+        .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
+        .then((response) => {
+          // Emit event to notify parent component of flag status change
+          this.$emit("flagged", {
+            songId,
+            isFlagged: response.data.message === "Song flagged" ? 1 : 0,
+          });
+        })
+        .catch((error) => {
+          console.error("Error flagging/unflagging track:", error);
+        });
     },
     deleteTrack() {
       // Handle delete track logic
