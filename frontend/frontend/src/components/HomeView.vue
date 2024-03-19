@@ -19,10 +19,10 @@
         <div class="text section-title">Most Rated Songs</div>
         <div class="card-container">
           <CardView
-            @click="handleCardClick(card)"
             v-for="(card, index) in mostRatedSongs"
             :key="index"
             :data="card"
+            @click="handlecard(card)"
           />
         </div>
       </div>
@@ -89,18 +89,14 @@ export default {
       playlists: [],
       genre_data: [],
       recent_songs: [],
-      uploadsong_id: "",
     };
   },
   created() {
-    console.log("Created");
     this.fetchMostRatedSongs();
-    this.fetchplaylist(); // You might want to remove this if not needed
   },
   methods: {
     async fetchMostRatedSongs() {
       try {
-        console.log("Upload song id", this.uploadsong_id);
         const response = await axios.get("http://localhost:5000/", {});
         console.log(response);
         if (response.status === 200) {
@@ -109,8 +105,10 @@ export default {
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
           this.recent_songs = response.data.recent_songs;
-          this.uploadsong_id =
-            this.mostRatedSongs.length > 0 ? this.mostRatedSongs[0] : null;
+
+          await axios.post("http://localhost:5000/", {
+            uploadsong_id: this.mostRatedSongs[0][0],
+          });
         } else {
           console.error(
             "Failed to fetch most rated songs:",
@@ -121,8 +119,19 @@ export default {
         console.error("Error fetching most rated songs:", error);
       }
     },
-    async fetchplaylist() {
-      // Implement this method if needed
+    async handlecard(card) {
+      try {
+        const uploadsongId = card[0];
+        console.log(uploadsongId);
+        if (uploadsongId !== null) {
+          const response = await axios.post("http://localhost:5000/", {
+            uploadsong_id: uploadsongId,
+          });
+          console.log(response);
+        }
+      } catch (error) {
+        console.error("Error sending upload song ID:", error);
+      }
     },
   },
 };

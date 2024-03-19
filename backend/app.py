@@ -54,7 +54,7 @@ def fetch_recent_songs(uploadsong_id):
         if existing_record:
             conn = sqlite3.connect("user_data.db", check_same_thread=False)
             cursor = conn.cursor()
-        
+
             current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
             cursor.execute("UPDATE Recent_songs SET Click_Date_Time = ? WHERE uploadsong_id = ?", (current_datetime, uploadsong_id))
@@ -89,7 +89,7 @@ def fetchedsongdata():
             )
             uploadsong_ids = cursor.fetchall()
             uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
-
+            
             songs = []
             
             for uploadsong_id in uploadsong_ids:
@@ -584,11 +584,9 @@ def creatorsdash():
 
     return jsonify(data)
 
-
 @app.route("/uploads/<filename>", methods=["GET"])
 def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
-
 
 @app.route("/useraccount", methods=["GET"])
 def useraccount():
