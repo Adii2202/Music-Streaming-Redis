@@ -1,11 +1,13 @@
 <template>
   <div class="ml-4 mt-4 mr-4 vercel-track-view">
     <span class="text-h6 vercel-title">{{ song[1] }}</span>
-    <span class="text-h6 vercel-flagged">
-      {{ song[8] === 1 ? "Flagged" : "Not Flagged" }}
+    <span ref="flaggedStatus" class="text-h6 vercel-flagged">
+      {{ flagtext }}
     </span>
     <button class="vercel-button" @click="viewLyrics">View Lyrics</button>
-    <button class="vercel-button" @click="flagTrack">Flag</button>
+    <button class="vercel-button" @click="flagTrack">
+      {{ flagButtonText }}
+    </button>
     <button class="vercel-button" @click="deleteTrack">Delete</button>
   </div>
 </template>
@@ -17,35 +19,50 @@ export default {
   props: {
     song: Object, // Define song as a prop
   },
+  data() {
+    return {
+      flagButtonText: this.song[8] === 1 ? "Unflag" : "Flag",
+      flagtext: this.song[8] == 0 ? "Not Flagged" : "Flagged", // Initialize button text
+    };
+  },
   methods: {
     viewLyrics() {
       // Handle view lyrics logic
       console.log("View Lyrics clicked");
     },
     flagTrack() {
-      // Handle flag track logic
-      // const newFlagStatus = this.song[8] === 1 ? 0 : 1;
-      // const songId = this.song[0];
-      // // Perform GET request to flag/unflag endpoint
-      // axios
-      //   .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
-      //   .then((response) => {
-      //     // Update the isFlagged property of the song data
-      //     this.songId = response.data.message === "Song flagged" ? 1 : 0;
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error flagging/unflagging track:", error);
-      //   });
+      console.log("hello");
+      console.log(this.flagButtonText);
+      if (this.flagButtonText == "Flag") {
+        // Assuming initial text on button is "Flag"
+        this.flagButtonText = "Unflag"; // Change button text to "Unflag" after click
+        this.flagtext = "Flagged"; // Assuming you want to update some text indicating it's flagged
+      } else {
+        this.flagButtonText = "Flag"; // Change button text to "Flag" after click
+        this.flagtext = "Not Flagged"; // Assuming you want to update some text indicating it's not flagged
+      }
+      // Extract song ID from props
       const songId = this.song[0];
+
       // Perform GET request to flag/unflag endpoint
       axios
         .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
         .then((response) => {
+          // Update the button text based on the flag status
+          this.flagButtonText =
+            response.data.message === "Song flagged" ? "Unflag" : "Flag";
+
           // Emit event to notify parent component of flag status change
           this.$emit("flagged", {
             songId,
             isFlagged: response.data.message === "Song flagged" ? 1 : 0,
           });
+
+          // Update the flagged status text immediately
+          this.$refs.flaggedStatus.innerText =
+            response.data.message === "Song flagged"
+              ? "Flagged"
+              : "Not Flagged";
         })
         .catch((error) => {
           console.error("Error flagging/unflagging track:", error);
