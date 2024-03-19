@@ -39,14 +39,19 @@ app.config["UPLOAD_FOLDER"] = "uploads"
 session = {}
 # simple_app.conf.update(app.config)
 redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
-
+song_data = []
 @simple_app.task
 def fetch_recent_songs(uploadsong_id):
     try:
         conn = sqlite3.connect("user_data.db", check_same_thread=False)
         cursor = conn.cursor()
+        
         print(f"uploadsong_id: {uploadsong_id}")
-        # Check if uploadsong_id exists in Recent_songs
+        
+          # Initialize an empty list to store songs
+        cursor.execute(f"SELECT title, genre, artist, duration, date FROM uploadsong WHERE uploadsong_id = {uploadsong_id};")
+        song_data.extend(cursor.fetchall())
+
         cursor.execute("SELECT Click_Date_Time FROM Recent_songs WHERE uploadsong_id = ?", (uploadsong_id,))
         conn.commit()
         existing_record = cursor.fetchone()
@@ -58,21 +63,23 @@ def fetch_recent_songs(uploadsong_id):
             current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
             cursor.execute("UPDATE Recent_songs SET Click_Date_Time = ? WHERE uploadsong_id = ?", (current_datetime, uploadsong_id))
-            conn.commit()
         else:
             conn = sqlite3.connect("user_data.db", check_same_thread=False)
             cursor = conn.cursor()
 
             current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute("INSERT INTO Recent_songs (uploadsong_id, Click_Date_Time) VALUES (?, ?)", (uploadsong_id, current_datetime))
-            conn.commit()
-        return {"message": "Recent songs updated successfully."}
+        
+        conn.commit()
+        data = {"song": song_data}
+        return data
     
     except sqlite3.Error as sqlite_error:
         return {"error": f"SQLite error: {str(sqlite_error)}"}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
-
+    finally:
+        conn.close()
 
 @app.route("/", methods=['GET', 'POST'])
 def fetchedsongdata():
@@ -89,7 +96,7 @@ def fetchedsongdata():
             )
             uploadsong_ids = cursor.fetchall()
             uploadsong_ids = [uploadsong_id[0] for uploadsong_id in uploadsong_ids]
-            
+
             songs = []
             
             for uploadsong_id in uploadsong_ids:

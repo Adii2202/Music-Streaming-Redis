@@ -104,7 +104,6 @@ export default {
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
-          this.recent_songs = response.data.recent_songs;
 
           await axios.post("http://localhost:5000/", {
             uploadsong_id: this.mostRatedSongs[0][0],
@@ -127,7 +126,8 @@ export default {
           const response = await axios.post("http://localhost:5000/", {
             uploadsong_id: uploadsongId,
           });
-          console.log(response);
+          console.log("recent songs : " + response);
+          this.recent_songs = response.data.recent_songs;
         }
       } catch (error) {
         console.error("Error sending upload song ID:", error);
