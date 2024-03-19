@@ -8,7 +8,7 @@
         <div class="text section-title">Recent Songs</div>
         <div class="card-container">
           <CardView
-            v-for="(card, index) in cardData"
+            v-for="(card, index) in recent_songs"
             :key="index"
             :data="card"
           />
@@ -19,6 +19,7 @@
         <div class="text section-title">Most Rated Songs</div>
         <div class="card-container">
           <CardView
+            @click="handleCardClick(card)"
             v-for="(card, index) in mostRatedSongs"
             :key="index"
             :data="card"
@@ -54,12 +55,11 @@
       <div class="mb-16 section">
         <div class="text section-title">Explore Genre</div>
         <div class="card-container">
-          <PlaylistcardView />
-          <!-- <PlaylistcardView
+          <PlaylistcardView
             v-for="(card, index) in genre_data"
             :key="index"
             :data="card"
-          /> -->
+          />
         </div>
       </div>
     </div>
@@ -88,23 +88,29 @@ export default {
       albums: [],
       playlists: [],
       genre_data: [],
+      recent_songs: [],
+      uploadsong_id: "",
     };
   },
   created() {
+    console.log("Created");
     this.fetchMostRatedSongs();
-    this.fetchplaylist();
+    this.fetchplaylist(); // You might want to remove this if not needed
   },
   methods: {
     async fetchMostRatedSongs() {
       try {
-        console.log("121");
-        const response = await axios.get("http://localhost:5000/");
+        console.log("Upload song id", this.uploadsong_id);
+        const response = await axios.get("http://localhost:5000/", {});
         console.log(response);
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
+          this.recent_songs = response.data.recent_songs;
+          this.uploadsong_id =
+            this.mostRatedSongs.length > 0 ? this.mostRatedSongs[0] : null;
         } else {
           console.error(
             "Failed to fetch most rated songs:",
@@ -115,7 +121,9 @@ export default {
         console.error("Error fetching most rated songs:", error);
       }
     },
-    async fetchplaylist() {},
+    async fetchplaylist() {
+      // Implement this method if needed
+    },
   },
 };
 </script>
