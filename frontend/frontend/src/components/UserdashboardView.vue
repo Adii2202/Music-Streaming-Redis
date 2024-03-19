@@ -34,10 +34,16 @@
                 </router-link>
               </div>
             </div>
-            <div class="transprent mt-8" v-if="tracks.length > 0">
-              <UsersongalbumView :items="tracks" />
+            <div class="transprent mt-8">
+              <div v-for="(track, index) in tracks" :key="index">
+                <div>
+                  {{ track[1][1] }} | {{ track[2][2] }} | {{ track[5][3] }}
+                </div>
+              </div>
+              <div class="transprent mt-8" v-if="tracks.length === 0">
+                No tracks available
+              </div>
             </div>
-            <div class="transprent mt-8" v-else>No tracks available</div>
           </div>
         </div>
         <div>
@@ -50,10 +56,15 @@
                 </router-link>
               </div>
             </div>
-            <div class="transprent mt-8" v-if="albums.length > 0">
-              <UsersongalbumView :items="albums" />
+            <div class="transprent mt-8">
+              <div v-for="(album, index) in albums" :key="index">
+                <!-- Display album name and date from 2nd and 3rd indices -->
+                <div>{{ album[2] }} | {{ album[3] }}</div>
+              </div>
+              <div class="transprent mt-8" v-if="albums.length === 0">
+                No albums available
+              </div>
             </div>
-            <div class="transprent mt-8" v-else>No albums available</div>
           </div>
         </div>
       </div>
@@ -62,38 +73,64 @@
   </div>
 </template>
 
+<!-- Your existing script and style sections remain unchanged -->
+
 <script>
 import LinechartView from "./LinechartView.vue";
-import UsersongalbumView from "./UsersongalbumView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
+import axios from "axios";
+
 export default {
   name: "UserdashboardView",
   components: {
-    UsersongalbumView,
     LinechartView,
     CurrentplaybarView,
   },
   data() {
-    const tracks = [
-      { title: "Song 1", date: "2022-03-01" },
-      { title: "Song 2", date: "2022-03-02" },
-    ];
-
-    const albums = [
-      { title: "Song 1", date: "2022-03-01" },
-      { title: "Song 2", date: "2022-03-02" },
-      { title: "Song 2", date: "2022-03-02" },
-    ];
-
     return {
-      tracks,
-      albums,
-      songCount: tracks.length, // Replace with your actual song count
-      albumCount: albums.length, // Replace with your actual album count
+      tracks: {}, // Initialize as an empty array
+      albums: [],
+      songCount: 0,
+      albumCount: 0,
     };
+  },
+  created() {
+    this.fetchDashboardData();
+    this.fetchTracklist();
+  },
+  methods: {
+    async fetchDashboardData() {
+      try {
+        const response = await axios.get("http://localhost:5000/creatorsdash");
+        console.log(response);
+        if (response.status === 200) {
+          this.songCount = response.data.title_count;
+          this.albumCount = response.data.album_count;
+          this.albums = response.data.albums;
+        } else {
+          console.error("Failed to fetch dashboard data:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    },
+    async fetchTracklist() {
+      try {
+        const response = await axios.get("http://localhost:5000/tracklist");
+        console.log(response);
+        if (response.status === 200) {
+          this.tracks = response.data.tracks;
+        } else {
+          console.error("Failed to fetch dashboard data:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    },
   },
 };
 </script>
+
 <style scoped>
 .upload-button {
   align-items: left;
