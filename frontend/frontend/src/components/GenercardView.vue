@@ -1,12 +1,15 @@
 <template>
   <div class="song-card" @mouseover="startHover" @mouseleave="endHover">
     <div class="pt-12 pl-12 pr-12 pb-4 w-auto">
-      <span class="song-name">{{ data[1] }}</span>
-      <span class="artist-name">{{ data[2] }}</span>
-      <span class="rating">{{ data[3] }}</span>
-      <router-link to="/play" class="upload-button"> Play </router-link>
+      <span class="song-name">{{ data[0] }}</span>
+      <span class="artist-name">{{}}</span>
+      <span class="rating">{{ rating }}</span>
+      <router-link to="/playlistsongs" class="upload-button">
+        Open
+      </router-link>
     </div>
 
+    <!-- Include the PlayModal component -->
     <PlaymodelView
       v-if="showModal"
       :songName="songName"
@@ -18,20 +21,20 @@
 </template>
 
 <script>
-import PlaymodelView from "../components/PlaymodelView.vue";
+// import PlaymodelView from "../components/PlaymodelView.vue";
 export default {
-  name: "CardView",
+  name: "GenercardView",
   components: {
-    PlaymodelView,
-  },
-  props: {
-    data: Object, // Define the prop to hold the data object
+    // PlaymodelView,
   },
   data() {
     return {
       showModal: false,
       isHovered: false,
     };
+  },
+  props: {
+    data: Object, // Define the prop to hold the data object
   },
   methods: {
     openModal() {
@@ -68,10 +71,6 @@ export default {
   align-items: center;
 }
 
-/* .song-card .pb-4 {
-  margin-top: 10px; 
-} */
-
 .upload-button {
   align-items: left;
   padding: 10px 10px;
@@ -90,7 +89,7 @@ export default {
   background-color: #4fa3d1; /* Darker shade on hover */
 }
 .song-name {
-  font-size: 1.5em;
+  font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 10px;
 }
@@ -102,7 +101,7 @@ export default {
 }
 
 .artist-name {
-  font-size: 1.2em;
+  font-size: 1em;
   margin-bottom: 10px;
   opacity: 0.7; /* Slightly reduce opacity for a subdued look */
 }
@@ -112,22 +111,20 @@ export default {
   margin-bottom: 10px;
 }
 
-.upload-button {
-  padding: 10px 30px; /* Adjust padding as needed */
+.play-button {
+  align-items: left;
+  padding: 10px 20px;
   margin-top: 10px;
   background-color: #61dafb; /* Spotify's green color */
   color: black;
   border: none;
-  border-radius: 4%; /* Make it round */
+  border-radius: 10%; /* Make it round */
   cursor: pointer;
-  text-decoration: none;
+  font-size: 1.2em; /* Slightly larger font size */
   transition: background-color 0.3s ease;
-  display: inline-block; /* Ensure the button behaves like a block element */
 }
 
-.upload-button:hover {
+.play-button:hover {
   background-color: #4fa3d1; /* Darker shade on hover */
 }
-
-/* Adjust the positioning of the button */
 </style>

@@ -5,6 +5,9 @@
     <router-link to="/home" class="nav-link"
       ><span class="text">Home</span></router-link
     >
+    <router-link to="/userdash" class="nav-link"
+      ><span class="text">Dashboard</span></router-link
+    >
     <router-link to="/creator" class="nav-link"
       ><span class="text">Creators Account</span></router-link
     >
@@ -34,7 +37,7 @@ export default {
   methods: {
     async logout() {
       try {
-        const response = await axios.post("http://localhost:5000/logout");
+        const response = await axios.post("http://127.0.0.1:5000/logout");
 
         if (response.status === 200) {
           // Redirect to login page after successful logout

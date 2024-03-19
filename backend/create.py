@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect("backend/user_data.db")
+conn = sqlite3.connect("user_data.db")
 cursor = conn.cursor()
 
 # -------- user login register ---------
@@ -120,4 +120,23 @@ cursor = conn.cursor()
 #     print(f"Error: {e}")
 #     conn.rollback()
 
+
+
+# sql_insert = """
+# INSERT INTO uploadsong (title, artist, genre, duration, date, filename, lyrics, isFlagged, creator_id, album_id)
+# VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+# """
+
+# # Define the song details
+# song_details = ('Song Title', 'Artist Name', 'Genre', 300, '2024-03-19', 'song.mp3', 'Lyrics here', 0, 1, 1)
+
+# # Execute the INSERT statement with the song details
+# cursor.execute(sql_insert, song_details)
+
+# # Commit the transaction to save the changes
+# conn.commit()
+
+# # Close the cursor and the connection
+# cursor.close()
+# conn.close()
 conn.commit()

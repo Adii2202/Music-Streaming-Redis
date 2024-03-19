@@ -15,7 +15,11 @@
             <h2 class="text ml-8 pt-8 font-weight-bold text-h4 mb-2">
               {{ genreName }}
             </h2>
-            <GenerView :genreSongs="songs" />
+            <GenerView
+              :genreSongs="songs"
+              :genreName="genreName"
+              @deleted="removeSongFromGenre"
+            />
           </div>
         </div>
       </div>
@@ -26,71 +30,39 @@
 <script>
 import GenerView from "./GenerView.vue";
 import AdminnavbarView from "./AdminnavbarView.vue";
-// import BarView from "./BarView.vue";
 import axios from "axios";
 
-// import TracksView from "../components/TracksView.vue";
 export default {
   name: "AdmintracksView",
   components: {
-    // TracksView,
     GenerView,
     AdminnavbarView,
-    // BarView,
   },
   mounted() {
-    // Make the GET request to the /tracklist endpoint when the component is mounted
-    axios
-      .get("http://127.0.0.1:5000/tracklist")
-      .then((response) => {
-        this.genreData = response.data;
-        console.log(this.genreData);
-        // Update genreData with the response data
-        Object.keys(this.genreData).forEach((genreKey) => {
-          // Accessing data for each genre dynamically
-          const genreSongs = this.genreData[genreKey];
-          console.log(`Songs for ${genreKey}:`, genreSongs);
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    this.fetchData();
   },
   data() {
     return {
-      genreData: {
-        rockSongs: [
-          { id: 1, title: "Rock Song 1", isFlagged: false },
-          { id: 2, title: "Rock Song 2", isFlagged: true },
-          { id: 2, title: "Rock Song 2", isFlagged: true },
-          // Add more songs as needed
-        ],
-        Hiphop: [
-          { id: 1, title: "Hip Hop Song 1", isFlagged: false },
-          { id: 2, title: "Hip Hop Song 2", isFlagged: true },
-          // Add more songs as needed
-        ],
-        // Add data for other genres if needed
-      },
+      genreData: {},
       searchQuery: "",
     };
   },
   methods: {
-    generateChartData(songs) {
-      // Generate chart data based on the number of songs
-      const labels = songs.map((song) => song.title);
-      const data = songs.map((song) => song.isFlagged);
-
-      return {
-        labels,
-        datasets: [
-          {
-            label: "Flagged Songs",
-            backgroundColor: "#4CAF50", // Adjust color as needed
-            data,
-          },
-        ],
-      };
+    fetchData() {
+      axios
+        .get("http://127.0.0.1:5000/tracklist")
+        .then((response) => {
+          this.genreData = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    },
+    removeSongFromGenre({ songId, genreName }) {
+      // Remove the deleted song from genreData
+      this.genreData[genreName] = this.genreData[genreName].filter(
+        (song) => song.id !== songId
+      );
     },
     search() {
       // Your search logic here

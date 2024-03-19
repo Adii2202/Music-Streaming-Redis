@@ -31,7 +31,11 @@
       <div class="section">
         <div class="text section-title">Albums</div>
         <div class="card-container">
-          <CardView v-for="(card, index) in albums" :key="index" :data="card" />
+          <AlbumcardView
+            v-for="(card, index) in albums"
+            :key="index"
+            :data="card"
+          />
         </div>
       </div>
 
@@ -39,7 +43,7 @@
       <div class="section">
         <div class="text section-title">Your Playlists</div>
         <div class="card-container">
-          <CardView
+          <PlaylistcardView
             v-for="(card, index) in playlists"
             :key="index"
             :data="card"
@@ -51,7 +55,7 @@
       <div class="mb-16 section">
         <div class="text section-title">Explore Genre</div>
         <div class="card-container">
-          <CardView
+          <GenercardView
             v-for="(card, index) in genre_data"
             :key="index"
             :data="card"
@@ -69,11 +73,17 @@ import CardView from "./CardView.vue";
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
+import PlaylistcardView from "./PlaylistcardView.vue";
+import AlbumcardView from "./AlbumscardView.vue";
+import GenercardView from "./GenercardView.vue";
 export default {
   name: "HomeView",
   components: {
     CardView,
     UsernavbarView,
+    PlaylistcardView,
+    AlbumcardView,
+    GenercardView,
     CurrentplaybarView,
   },
   data() {
@@ -91,15 +101,16 @@ export default {
   methods: {
     async fetchMostRatedSongs() {
       try {
-        const response = await axios.get("http://localhost:5000/", {});
+        const response = await axios.get("http://127.0.0.1:5000/", {});
         console.log(response);
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
-
-          await axios.post("http://localhost:5000/", {
+          // console.log(response.data.songs);
+          console.log(response);
+          await axios.post("http://127.0.0.1:5000/", {
             uploadsong_id: this.mostRatedSongs[0][0],
           });
         } else {

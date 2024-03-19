@@ -31,9 +31,10 @@ export default {
   methods: {
     async fetch() {
       try {
-        const response = await axios.get("http://localhost:5000/useraccount");
+        const response = await axios.get("http://127.0.0.1:5000/useraccount");
         // Extract username and email from the response data
         const { username, email } = response.data;
+        console.log(response);
         // Update data properties with fetched data
         this.role = username;
         this.name = email;
@@ -84,6 +85,7 @@ export default {
 }
 
 .role {
+  color: white;
   font-size: 1.5em;
   margin-bottom: 10px;
 }

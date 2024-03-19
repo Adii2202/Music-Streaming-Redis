@@ -84,7 +84,7 @@ const routes = [
   },
   {
     path: "/playlistsongs",
-    name: "PlaylistsongsView",
+    name: "playlistsongs",
     component: PlaylistsongsView,
   },
 ];
