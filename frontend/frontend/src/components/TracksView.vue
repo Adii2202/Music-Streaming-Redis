@@ -1,7 +1,9 @@
 <template>
   <div class="ml-4 mt-4 mr-4 vercel-track-view">
-    <span class="text-h6 vercel-title">{{ song.title }}</span>
-    <span class="text-h6 vercel-flagged">{{ song.isFlagged }}</span>
+    <span class="text-h6 vercel-title">{{ song[1] }}</span>
+    <span class="text-h6 vercel-flagged">
+      {{ song[8] === 1 ? "Flagged" : "Not Flagged" }}
+    </span>
     <button class="vercel-button" @click="viewLyrics">View Lyrics</button>
     <button class="vercel-button" @click="flagTrack">Flag</button>
     <button class="vercel-button" @click="deleteTrack">Delete</button>
@@ -9,6 +11,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "TracksView",
   props: {
@@ -21,7 +24,35 @@ export default {
     },
     flagTrack() {
       // Handle flag track logic
-      console.log("Flag clicked");
+      const newFlagStatus = this.song[8] === 1 ? 0 : 1;
+      const songId = this.song[0];
+
+      // Perform GET request to flag/unflag endpoint
+      axios
+        .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
+        .then((response) => {
+          // Update the isFlagged property of the song data
+          this.songId = response.data.message === "Song flagged" ? 1 : 0;
+        })
+        .catch((error) => {
+          console.error("Error flagging/unflagging track:", error);
+        });
+
+      // const songId = this.song[0];
+
+      // Perform GET request to flag/unflag endpoint
+      // axios
+      //   .get(`http://127.0.0.1:5000/flagunflag/${songId}`)
+      //   .then((response) => {
+      //     // Emit event to notify parent component of flag status change
+      //     this.$emit("flagged", {
+      //       songId,
+      //       isFlagged: response.data.message === "Song flagged" ? 1 : 0,
+      //     });
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error flagging/unflagging track:", error);
+      //   });
     },
     deleteTrack() {
       // Handle delete track logic

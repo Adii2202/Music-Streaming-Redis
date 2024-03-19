@@ -8,7 +8,7 @@
         <div class="text section-title">Recent Songs</div>
         <div class="card-container">
           <CardView
-            v-for="(card, index) in recent_songs"
+            v-for="(card, index) in cardData"
             :key="index"
             :data="card"
           />
@@ -19,7 +19,6 @@
         <div class="text section-title">Most Rated Songs</div>
         <div class="card-container">
           <CardView
-            @click="handleCardClick(card)"
             v-for="(card, index) in mostRatedSongs"
             :key="index"
             :data="card"
@@ -31,11 +30,7 @@
       <div class="section">
         <div class="text section-title">Albums</div>
         <div class="card-container">
-          <PlaylistcardView
-            v-for="(card, index) in albums"
-            :key="index"
-            :data="card"
-          />
+          <CardView v-for="(card, index) in albums" :key="index" :data="card" />
         </div>
       </div>
 
@@ -43,7 +38,7 @@
       <div class="section">
         <div class="text section-title">Your Playlists</div>
         <div class="card-container">
-          <PlaylistcardView
+          <CardView
             v-for="(card, index) in playlists"
             :key="index"
             :data="card"
@@ -55,7 +50,7 @@
       <div class="mb-16 section">
         <div class="text section-title">Explore Genre</div>
         <div class="card-container">
-          <PlaylistcardView
+          <CardView
             v-for="(card, index) in genre_data"
             :key="index"
             :data="card"
@@ -70,7 +65,6 @@
 
 <script>
 import CardView from "./CardView.vue";
-import PlaylistcardView from "./PlaylistcardView.vue";
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
@@ -79,7 +73,6 @@ export default {
   components: {
     CardView,
     UsernavbarView,
-    PlaylistcardView,
     CurrentplaybarView,
   },
   data() {
@@ -88,29 +81,23 @@ export default {
       albums: [],
       playlists: [],
       genre_data: [],
-      recent_songs: [],
-      uploadsong_id: "",
     };
   },
   created() {
-    console.log("Created");
     this.fetchMostRatedSongs();
-    this.fetchplaylist(); // You might want to remove this if not needed
+    this.fetchplaylist();
   },
   methods: {
     async fetchMostRatedSongs() {
       try {
-        console.log("Upload song id", this.uploadsong_id);
-        const response = await axios.get("http://localhost:5000/", {});
+        console.log("121");
+        const response = await axios.get("http://localhost:5000/");
         console.log(response);
         if (response.status === 200) {
           this.mostRatedSongs = response.data.songs;
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
-          this.recent_songs = response.data.recent_songs;
-          this.uploadsong_id =
-            this.mostRatedSongs.length > 0 ? this.mostRatedSongs[0] : null;
         } else {
           console.error(
             "Failed to fetch most rated songs:",
@@ -121,9 +108,7 @@ export default {
         console.error("Error fetching most rated songs:", error);
       }
     },
-    async fetchplaylist() {
-      // Implement this method if needed
-    },
+    async fetchplaylist() {},
   },
 };
 </script>
