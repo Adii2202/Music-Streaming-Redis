@@ -724,69 +724,69 @@ def push_search_song_results(songs):
 #     return render_template("adminflag.html", genresnsongs=genre_songs)
 
 
-# @app.route("/play/<id>", methods=["GET", "POST"])
-# def play(id):
-#     if request.method == "GET":
-#         cursor.execute("SELECT * FROM uploadsong WHERE uploadsong_id = ?", (id,))
-#         data = cursor.fetchone()
-#         if "username" in session:
-#             username = session["username"]
-#             cursor.execute(
-#                 "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
-#                 (username, id),
-#             )
-#             rating = cursor.fetchone()
-#             if rating is not None:
-#                 rating = rating[0]
-#                 return render_template("lyricsnplay.html", data=data, rating=rating)
-#             else:
-#                 return render_template("lyricsnplay.html", data=data)
-#     else:
-#         print("Received rating data from client")
-#         rating = request.form["rate"]
-#         print(f"Received rating: {rating}")
-#         # save this to database if present already by this user then update else insert
-#         if "username" in session:
-#             username = session["username"]
-#             cursor.execute(
-#                 "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
-#                 (username, id),
-#             )
-#             rating_data = cursor.fetchone()
-#             if rating_data is None:
-#                 # i want to insert rating, uploadsong_id, username and like_date_time(which will be current date and time)
-#                 cursor.execute(
-#                     "INSERT INTO Likes (rating, uploadsong_id, username, Like_Date_Time) VALUES (?, ?, ?, datetime('now'))",
-#                     (rating, id, username),
-#                 )
-#                 conn.commit()
-#             else:
-#                 # i want to update rating and like_date_time(which will be current date and time)
-#                 cursor.execute(
-#                     "UPDATE Likes SET rating = ?, Like_Date_Time = datetime('now') WHERE username = ? AND uploadsong_id = ?",
-#                     (rating, username, id),
-#                 )
-#                 conn.commit()
-#             return redirect("/play/" + id)
-#     return render_template("lyricsnplay.html", data=data)
+@app.route("/play/<id>", methods=["GET", "POST"])
+def play(id):
+    if request.method == "GET":
+        cursor.execute("SELECT * FROM uploadsong WHERE uploadsong_id = ?", (id,))
+        data = cursor.fetchone()
+        if "username" in session:
+            username = session["username"]
+            cursor.execute(
+                "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
+                (username, id),
+            )
+            rating = cursor.fetchone()
+            if rating is not None:
+                rating = rating[0]
+                return render_template("lyricsnplay.html", data=data, rating=rating)
+            else:
+                return render_template("lyricsnplay.html", data=data)
+    else:
+        print("Received rating data from client")
+        rating = request.form["rate"]
+        print(f"Received rating: {rating}")
+        # save this to database if present already by this user then update else insert
+        if "username" in session:
+            username = session["username"]
+            cursor.execute(
+                "SELECT rating FROM Likes WHERE username = ? AND uploadsong_id = ?",
+                (username, id),
+            )
+            rating_data = cursor.fetchone()
+            if rating_data is None:
+                # i want to insert rating, uploadsong_id, username and like_date_time(which will be current date and time)
+                cursor.execute(
+                    "INSERT INTO Likes (rating, uploadsong_id, username, Like_Date_Time) VALUES (?, ?, ?, datetime('now'))",
+                    (rating, id, username),
+                )
+                conn.commit()
+            else:
+                # i want to update rating and like_date_time(which will be current date and time)
+                cursor.execute(
+                    "UPDATE Likes SET rating = ?, Like_Date_Time = datetime('now') WHERE username = ? AND uploadsong_id = ?",
+                    (rating, username, id),
+                )
+                conn.commit()
+            return redirect("/play/" + id)
+    return jsonify(data=data)
 
 
 # from functools import wraps
 
 
-# # Define a decorator to check if the user is an admin
-# # def admin_required(route_function):
-# #     @wraps(route_function)
-# #     def wrapper(*args, **kwargs):
-# #         # Check if 'isAdmin' is present in the session and is equal to 1
-# #         print(isAdmin)
-# #         if session.get("isAdmin") == 1:
-# #             return route_function(*args, **kwargs)
-# #         else:
-# #             # Redirect to loginuser.html if not an admin
-# #             return redirect("/loginuser")
+# Define a decorator to check if the user is an admin
+# def admin_required(route_function):
+#     @wraps(route_function)
+#     def wrapper(*args, **kwargs):
+#         # Check if 'isAdmin' is present in the session and is equal to 1
+#         print(isAdmin)
+#         if session.get("isAdmin") == 1:
+#             return route_function(*args, **kwargs)
+#         else:
+#             # Redirect to loginuser.html if not an admin
+#             return redirect("/loginuser")
 
-# #     return wrapper
+#     return wrapper
 
 
 @app.route("/admin", methods=["GET"])
