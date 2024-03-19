@@ -2,7 +2,7 @@
   <Bar
     id="my-chart-id"
     :options="chartOptions"
-    :data="chartData"
+    :data="chartDataComputed"
     :style="myStyles"
   />
 </template>
@@ -32,9 +32,22 @@ export default {
   name: "BarView",
   components: { Bar },
   props: {
-    genreData: Object, // Assuming genreData is an object with genre names as keys and arrays of songs as values
+    chartCategories: Array,
+    chartData: Array,
   },
   computed: {
+    chartDataComputed() {
+      return {
+        labels: this.chartCategories,
+        datasets: [
+          {
+            label: "Number of Uploads",
+            backgroundColor: "#61dafb", // Adjust color as needed
+            data: this.chartData,
+          },
+        ],
+      };
+    },
     myStyles() {
       return {
         height: `${400}px`,
@@ -42,28 +55,8 @@ export default {
       };
     },
   },
-  watch: {
-    genreData: {
-      handler(newGenreData) {
-        // When genreData changes, update chartData
-        this.updateChartData(newGenreData);
-      },
-      deep: true,
-      immediate: true, // Trigger the handler immediately on component mount
-    },
-  },
   data() {
     return {
-      chartData: {
-        labels: [],
-        datasets: [
-          {
-            label: "Number of Uploads",
-            backgroundColor: "#61dafb", // Adjust color as needed
-            data: [],
-          },
-        ],
-      },
       chartOptions: {
         responsive: true,
         scales: {
@@ -80,23 +73,6 @@ export default {
         },
       },
     };
-  },
-  methods: {
-    updateChartData(newGenreData) {
-      // Extract genre names and song counts from the new genre data
-      const genreNames = Object.keys(newGenreData);
-
-      // Sort genre names based on the number of songs in each genre
-      genreNames.sort(
-        (a, b) => newGenreData[b].length - newGenreData[a].length
-      );
-
-      const songCounts = genreNames.map((genre) => newGenreData[genre].length);
-
-      // Update chartData
-      this.chartData.labels = genreNames;
-      this.chartData.datasets[0].data = songCounts;
-    },
   },
 };
 </script>

@@ -27,6 +27,7 @@
 import GenerView from "./GenerView.vue";
 import AdminnavbarView from "./AdminnavbarView.vue";
 // import BarView from "./BarView.vue";
+import axios from "axios";
 
 // import TracksView from "../components/TracksView.vue";
 export default {
@@ -36,6 +37,24 @@ export default {
     GenerView,
     AdminnavbarView,
     // BarView,
+  },
+  mounted() {
+    // Make the GET request to the /tracklist endpoint when the component is mounted
+    axios
+      .get("http://127.0.0.1:5000/tracklist")
+      .then((response) => {
+        this.genreData = response.data;
+        console.log(this.genreData);
+        // Update genreData with the response data
+        Object.keys(this.genreData).forEach((genreKey) => {
+          // Accessing data for each genre dynamically
+          const genreSongs = this.genreData[genreKey];
+          console.log(`Songs for ${genreKey}:`, genreSongs);
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   },
   data() {
     return {
