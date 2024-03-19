@@ -524,6 +524,11 @@ def playlist(id):
         
 @app.route("/creatorsdash", methods=["GET"])
 def creatorsdash():
+    if "email" not in session:
+        return jsonify({"error": "User not logged in"}), 401
+    conn = sqlite3.connect("user_data.db", check_same_thread=False)
+    cursor = conn.cursor()
+
     cursor.execute(
         "SELECT strftime('%Y-%m-%d', Like_Date_Time) as like_date, Rating FROM Likes"
     )
@@ -542,9 +547,12 @@ def creatorsdash():
     formatted_ratings = {
         date: round(rating, 3) for date, rating in average_ratings.items()
     }
-
+    
     if "email" in session:
         email = session["email"]
+        conn = sqlite3.connect("user_data.db", check_same_thread=False)
+        cursor = conn.cursor()
+
         cursor.execute("SELECT creator_id FROM creator WHERE email = ?", (email,))
         creator_ids = cursor.fetchall()
 
@@ -926,6 +934,10 @@ def admin():
 @app.route("/tracklist", methods=["GET", "POST"])
 def tracklist():
     if request.method == "GET":
+        if "email" not in session:
+            return jsonify({"error": "User not logged in"}), 401
+        conn = sqlite3.connect("user_data.db", check_same_thread=False)
+        cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT genre FROM uploadsong")
         genres = cursor.fetchall()
         genres = [genre[0] for genre in genres]
