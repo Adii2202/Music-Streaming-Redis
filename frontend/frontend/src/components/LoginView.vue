@@ -50,7 +50,7 @@ export default {
   methods: {
     async submitLogin() {
       try {
-        const response = await axios.post("http://localhost:5000/loginuser", {
+        const response = await axios.post("http://127.0.0.1:5000/loginuser", {
           username: this.username,
           password: this.password,
         });

@@ -1,25 +1,32 @@
 <template>
   <div class="genre-view">
     <div v-for="song in genreSongs" :key="song.id">
-      <!-- Display song details here -->
-      <TracksView :song="song" />
+      <TracksView :song="song" @deleted="handleDeletedSong" />
     </div>
   </div>
 </template>
 
 <script>
 import TracksView from "./TracksView.vue";
+
 export default {
-  name: "GenreView",
+  name: "GenerView",
   props: {
     genreSongs: Array,
+    genreName: String,
   },
   components: {
     TracksView,
+  },
+  methods: {
+    handleDeletedSong({ songId, genreName }) {
+      // Emit event to notify the parent component (AdmintracksView) about the deletion
+      this.$emit("deleted", { songId, genreName });
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Add styling for the genre view if needed */
+/* Your scoped styles */
 </style>

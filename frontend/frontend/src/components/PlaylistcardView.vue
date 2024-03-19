@@ -1,9 +1,10 @@
 <template>
   <div class="song-card" @mouseover="startHover" @mouseleave="endHover">
     <div class="pt-12 pl-12 pr-12 pb-4 w-auto">
-      <span class="song-name">{{ songName }}</span>
-      <span class="artist-name">{{ artistName }}</span>
+      <span class="song-name">{{ data[1] }}</span>
+      <span class="artist-name">{{}}</span>
       <span class="rating">{{ rating }}</span>
+      <!-- <PlaylistsongsView :id="data[0]" /> -->
       <router-link to="/playlistsongs" class="upload-button">
         Open
       </router-link>
@@ -21,17 +22,23 @@
 </template>
 
 <script>
+// import PlaylistsongsView from "./PlaylistsongsView.vue";
+
 // import PlaymodelView from "../components/PlaymodelView.vue";
 export default {
   name: "PlaylistcardView",
   components: {
     // PlaymodelView,
+    // PlaylistsongsView,
   },
   data() {
     return {
       showModal: false,
       isHovered: false,
     };
+  },
+  props: {
+    data: Object, // Define the prop to hold the data object
   },
   methods: {
     openModal() {
@@ -55,14 +62,17 @@ export default {
   background-color: #121212; /* Darker background color similar to Spotify */
   color: white;
   padding: 20px;
+  min-width: 250px; /* Set a minimum width for each card */
+  max-width: 400px; /* Optionally, set a maximum width for each card */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+  margin-bottom: 20px; /* Add margin between cards */
+}
+
+.song-card .pt-12 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  /* box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2); */
-  /* border: 0.25px solid #fff; */
 }
 
 .upload-button {

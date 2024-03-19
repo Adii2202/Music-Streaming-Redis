@@ -69,8 +69,20 @@ export default {
         });
     },
     deleteTrack() {
-      // Handle delete track logic
-      console.log("Delete clicked");
+      // Extract song ID from props
+      const songId = this.song.id;
+      const genreName = this.song.genre;
+      // Perform DELETE request to delete endpoint
+      axios
+        .delete(`http://127.0.0.1:5000/delete/${songId}`)
+        .then((response) => {
+          console.log("Song deleted:", response.data.message);
+          // Emit event to notify parent component of deletion
+          this.$emit("deleted", { songId, genreName });
+        })
+        .catch((error) => {
+          console.error("Error deleting track:", error);
+        });
     },
   },
 };

@@ -8,7 +8,7 @@
           <div class="text section-title">Recent Songs</div>
           <div class="card-container">
             <!-- <PlaylistcardView /> -->
-            <CardView />
+            <!-- <CardView /> -->
           </div>
         </div>
       </div>
@@ -17,17 +17,61 @@
     </div>
   </div>
 </template>
-
 <script>
-import CardView from "./CardView.vue";
-// import PlaylistcardView from "./PlaylistcardView.vue";
 import axios from "axios";
+import UsernavbarView from "./UsernavbarView.vue";
+import CurrentplaybarView from "./CurrentplaybarView.vue";
+
+export default {
+  name: "PlaylistsongsView",
+  components: {
+    UsernavbarView,
+    CurrentplaybarView,
+  },
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      songs: [],
+      playlistName: "",
+    };
+  },
+  methods: {
+    fetchPlaylist() {
+      // Make API call to fetch playlist songs using this.id
+      axios
+        .get(`/playlist/${this.id}`)
+        .then((response) => {
+          this.songs = response.data.songs;
+          this.playlistName = response.data.PlaylistName;
+        })
+        .catch((error) => {
+          console.error("Error fetching playlist:", error);
+        });
+    },
+  },
+  created() {
+    // Fetch playlist data
+    this.fetchPlaylist();
+  },
+};
+</script>
+
+<!-- 
+<script>
+// import CardView from "./CardView.vue";
+// import PlaylistcardView from "./PlaylistcardView.vue";
+// import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
 import CurrentplaybarView from "./CurrentplaybarView.vue";
 export default {
   name: "PlaylistsongsView",
   components: {
-    CardView,
+    // CardView,
     UsernavbarView,
     // PlaylistcardView,
     CurrentplaybarView,
@@ -40,35 +84,35 @@ export default {
       genre_data: [],
     };
   },
-  created() {
-    this.fetchMostRatedSongs();
-    this.fetchplaylist();
-  },
-  methods: {
-    async fetchMostRatedSongs() {
-      try {
-        console.log("121");
-        const response = await axios.get("http://localhost:5000/");
-        console.log(response);
-        if (response.status === 200) {
-          this.mostRatedSongs = response.data.songs;
-          this.albums = response.data.albums_data;
-          this.playlists = response.data.playlists;
-          this.genre_data = response.data.genre_data;
-        } else {
-          console.error(
-            "Failed to fetch most rated songs:",
-            response.data.error
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching most rated songs:", error);
-      }
-    },
-    async fetchplaylist() {},
-  },
+  // created() {
+  //   this.fetchMostRatedSongs();
+  //   this.fetchplaylist();
+  // },
+  // methods: {
+  //   async fetchMostRatedSongs() {
+  //     try {
+  //       console.log("121");
+  //       const response = await axios.get("http://:5000/");
+  //       console.log(response);
+  //       if (response.status === 200) {
+  //         this.mostRatedSongs = response.data.songs;
+  //         this.albums = response.data.albums_data;
+  //         this.playlists = response.data.playlists;
+  //         this.genre_data = response.data.genre_data;
+  //       } else {
+  //         console.error(
+  //           "Failed to fetch most rated songs:",
+  //           response.data.error
+  //         );
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching most rated songs:", error);
+  //     }
+  //   },
+  //   async fetchplaylist() {},
+  // },
 };
-</script>
+</script> -->
 
 <style scoped>
 .scroll-container {
