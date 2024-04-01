@@ -63,8 +63,6 @@
         </div>
       </div>
     </div>
-
-    <CurrentplaybarView />
   </div>
 </template>
 
@@ -72,7 +70,6 @@
 import CardView from "./CardView.vue";
 import axios from "axios";
 import UsernavbarView from "./UsernavbarView.vue";
-import CurrentplaybarView from "./CurrentplaybarView.vue";
 import PlaylistcardView from "./PlaylistcardView.vue";
 import AlbumcardView from "./AlbumscardView.vue";
 import GenercardView from "./GenercardView.vue";
@@ -84,7 +81,6 @@ export default {
     PlaylistcardView,
     AlbumcardView,
     GenercardView,
-    CurrentplaybarView,
   },
   data() {
     return {

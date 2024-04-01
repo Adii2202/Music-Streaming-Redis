@@ -14,29 +14,15 @@
           </div>
 
           <div class="custom-slider">
-            <!-- <label for="progress">Progress:</label>
-          <input
-            type="range"
-            id="progress"
-            v-model="progress"
-            @input="updateProgress"
-          /> -->
-            <!-- <span>{{ formattedTime(progress) }}</span> -->
-          </div>
-
-          <div class="player-controls">
-            <!-- Play/Pause button and progress bar -->
-
-            <div class="custom-slider">
-              <label class="text" for="musicTime">Music Time:</label>
-              <input
-                type="range"
-                id="musicTime"
-                v-model="musicTime"
-                @input="updateMusicTime"
-              />
-              <span class="text">{{ formattedTime(musicTime) }}</span>
-            </div>
+            <label class="text" for="musicTime">Music Time:</label>
+            <input
+              type="range"
+              id="musicTime"
+              v-model="musicTime"
+              @input="updateMusicTime"
+              :max="audioDuration"
+            />
+            <span class="text">{{ formattedTime(musicTime) }}</span>
           </div>
 
           <div class="custom-slider">
@@ -63,6 +49,7 @@
         </div>
       </div>
     </div>
+    <audio ref="audioPlayer" :src="audioSrc"></audio>
   </div>
 </template>
 
@@ -82,6 +69,8 @@ export default {
       progress: 0,
       volume: 50,
       musicTime: 0,
+      audioSrc: "../../backend/uploads/simple.mp3", // Change this to your audio file path
+      audioDuration: 0,
       lyrics: [
         "Verse 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "Chorus: Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
@@ -89,10 +78,20 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.$refs.audioPlayer.addEventListener("timeupdate", this.updateProgress);
+    this.$refs.audioPlayer.addEventListener("loadedmetadata", () => {
+      this.audioDuration = this.$refs.audioPlayer.duration;
+    });
+  },
   methods: {
     togglePlayPause() {
+      if (this.isPlaying) {
+        this.$refs.audioPlayer.pause();
+      } else {
+        this.$refs.audioPlayer.play();
+      }
       this.isPlaying = !this.isPlaying;
-      // Add logic to start/pause audio playback
     },
     formattedTime(seconds) {
       const minutes = Math.floor(seconds / 60);
@@ -103,20 +102,20 @@ export default {
     },
     increaseVolume() {
       this.volume = Math.min(100, this.volume + 10);
-      // Add logic to update audio volume
+      this.$refs.audioPlayer.volume = this.volume / 100;
     },
     decreaseVolume() {
       this.volume = Math.max(0, this.volume - 10);
-      // Add logic to update audio volume
+      this.$refs.audioPlayer.volume = this.volume / 100;
     },
     updateProgress() {
-      // Add logic to update audio playback progress
+      this.musicTime = this.$refs.audioPlayer.currentTime;
     },
     updateMusicTime() {
-      // Add logic to update music time
+      this.$refs.audioPlayer.currentTime = this.musicTime;
     },
     updateVolume() {
-      // Add logic to update audio volume
+      this.$refs.audioPlayer.volume = this.volume / 100;
     },
   },
 };
