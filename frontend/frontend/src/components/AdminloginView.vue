@@ -102,6 +102,7 @@ input {
   border: 1px solid #ddd;
   border-radius: 4px;
   box-sizing: border-box;
+  color: white;
 }
 
 button {

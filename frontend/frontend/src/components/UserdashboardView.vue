@@ -88,7 +88,7 @@ export default {
   },
   data() {
     return {
-      tracks: {}, // Initialize as an empty array
+      tracks: [], // Initialize as an empty array
       albums: [],
       songCount: 0,
       albumCount: 0,

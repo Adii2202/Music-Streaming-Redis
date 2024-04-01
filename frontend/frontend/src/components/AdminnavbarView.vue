@@ -6,9 +6,6 @@
       ><span class="text">Home</span></router-link
     >
 
-    <router-link to="/tracks" class="nav-link"
-      ><span class="text">Tracks</span></router-link
-    >
     <button @click="logout" class="nav-link">
       <span class="text">Log out</span>
     </button>
