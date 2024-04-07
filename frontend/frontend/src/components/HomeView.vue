@@ -89,6 +89,7 @@ export default {
       playlists: [],
       genre_data: [],
       recent_songs: [],
+      searchQuery: "", // Added data property for search query
     };
   },
   created() {
@@ -104,7 +105,6 @@ export default {
           this.albums = response.data.albums_data;
           this.playlists = response.data.playlists;
           this.genre_data = response.data.genre_data;
-          // console.log(response.data.songs);
           console.log(response);
           await axios.post("http://127.0.0.1:5000/", {
             uploadsong_id: this.mostRatedSongs[0][0],
@@ -132,6 +132,21 @@ export default {
         }
       } catch (error) {
         console.error("Error sending upload song ID:", error);
+      }
+    },
+    async search() {
+      try {
+        const response = await axios.post("http://127.0.0.1:5000/search", {
+          search: this.searchQuery,
+        });
+        console.log(response);
+        // Update data with search results
+        this.mostRatedSongs = response.data.songs;
+        this.albums = response.data.albums;
+        this.playlists = response.data.playlists;
+        this.genre_data = response.data.genres;
+      } catch (error) {
+        console.error("Error searching:", error);
       }
     },
   },
